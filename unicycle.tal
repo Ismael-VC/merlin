@@ -1,0 +1,158 @@
+(
+	# TODO:
+
+	-[x] Ignore spaces in input.
+	-[x] Write input to buffer for parsing.
+	-[ ] Parse each byte.
+	-[ ] Store each byte.
+)
+
+%DBG ( -- ) { #010e DEO }
+%DBG! ( -- ) { #010e DEO #010f DEO BRK }
+%space ( -- ) { [ LIT2 -SP -Console/write ] DEO }
+%newline ( -- ) { [ LIT2 -NL -Console/write ] DEO }
+%bar ( -- ) { [ LIT2 "| -Console/write ] DEO }
+%emit ( c -- ) { #18 DEO }
+
+|10 @Console &vector $2 &read $1 &pad $5 &write $1 &error $1
+|a0 @File &vector $2 &success $2 &stat $2 &delete $1 &append $1 &name $2 &length $2 &read $2 &write $2
+
+|20 @SP   |0a  @NL
+
+|000
+
+@input-buffer-pointer $2
+
+|100 ( -> )
+	;here DUP2 SWP2 STA2
+	;input-buffer .input-buffer-pointer STZ2
+	<print-banner>
+	<print-memory-usage>
+	Repl/<print-first-prompt>
+	;on-input .Console/vector DEO2
+	BRK
+
+BRK
+
+@Repl
+	&read ( buffer* -- )
+		/<print-prompt>
+
+	&eval
+
+
+	&print
+
+
+	&loop
+		JMP2r
+
+	&<print-first-prompt> ( -- )
+		( this just skips the first newline, I will make it better later :P )
+		;&prompt-start INC2 <print-string>
+		;here LDA2 <print-short>
+		;&prompt-end <print-string>
+		JMP2r
+
+	&<print-prompt> ( -- )
+		;&prompt-start <print-string>
+		;here LDA2 <print-short>
+		;&prompt-end <print-string>
+		JMP2r
+
+	&prompt-start 0a "փ 20 "[ $1
+	&prompt-end   "]> 20 $1
+
+
+@on-input ( -> )
+	.Console/read DEI
+	DUP #20 NEQ ?{ POP BRK ( ignore ) }
+	DUP #0a EQU ?{
+		.input-buffer-pointer LDZ2 STA
+		.input-buffer-pointer LDZ2 INC2 .input-buffer-pointer STZ2
+		;here DUP2 LDA2 INC2 SWP2 STA2 BRK }
+	POP ( consume last newline )
+	( #0000 .input-buffer-pointer STZ2 )
+	( DBG )
+	;input-buffer <print-memory>
+	Repl/read BRK
+
+@<print-string> ( string* -- )
+	LDAk .Console/write DEO
+	INC2 LDAk ?<print-string>
+	POP2 JMP2r
+
+@<print-short> ( short* -- )
+	SWP /<byte>
+	&<byte> ( byte -- )
+		DUP #04 SFT /<nibble>
+	&<nibble> ( byte -- )
+		#0f AND DUP #09 GTH #27 MUL ADD [ LIT "0 ] ADD #18 DEO
+		JMP2r
+
+@<print-memory-usage> ( -- )
+	;here <print-short>
+	;&used <print-string>
+	;end ;here SUB2 <print-short>
+	;&free <print-string>
+	JMP2r
+
+	&used 20 "bytes 20 "used, 20 $1
+	&free 20 "bytes 20 "free. 0a0a $1
+
+@<print-banner> ( -- )
+	;&banner <print-string>
+	JMP2r
+
+	&banner "Unicycle 20 "(©MMXXIV 20 "Ismael 20 "Venegas 20 "Castelló.) 0a0a $1
+
+@parse-byte-hexadecimal ( str* -: val* )
+	[ LIT2r 0000 ]
+	&w ( str* `acc* -- val* )
+	LDAk parse-nibble-hexadecimal INC #00 EQU ?{
+		[ LITr 40 ] SFT2r LDAk parse-nibble-hexadecimal [ LITr 00 ] STH
+		ADD2r INC2 LDAk ?&w }
+	POP2 STH2r NIP JMP2r
+
+@parse-nibble-hexadecimal ( c -- val! )
+	( dec ) [ LIT "0 ] SUB DUP #09 GTH ?{ JMP2r }
+	( hex ) #27 SUB DUP #0f GTH ?{ JMP2r }
+	( err ) POP #ff JMP2r
+
+@<print-memory> ( addr* -- ) [
+    STH2k
+    DUP2 paddr space
+    #0000
+    &>loop-bytes
+        ADD2k LDA <print-short>/<byte>
+        DUP #0f AND
+        DUP #07 NEQ ?{ space }
+        #0f NEQ ?{
+            space space
+            bar
+            OVR2 OVR2 ADD2 DUP2 #000f SUB2
+            &>loop-chars
+                LDAk
+                DUPk #20 GTH SWP #7f LTH AND ?{
+                    POP LIT ". }
+                emit
+                INC2 GTH2k ?&>loop-chars
+            POP2 POP2
+            bar
+            newline
+            DUP2 INC2 STH2kr ADD2 paddr }
+        space
+        INC NEQk ?&>loop-bytes
+    POP2 POP2 POP2r
+    newline
+    JMP2r
+]
+
+@emit ( c -- )  #18 DEO  JMP2r
+@paddr ( addr* -- )  <print-short> space  JMP2r
+
+@here
+
+|ff7f @end
+
+@input-buffer $80
