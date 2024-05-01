@@ -112,7 +112,7 @@ BRK
 	;&banner <print-string>
 	JMP2r
 
-	&banner "Unicycle \s "(©MMXXIV \s "Ismael \s "Venegas \s "Castelló.) \n \n $1
+	&banner "Monocycle Varvara/Uxn Concatenated Interpretive Uxntal Assembler REPL \s "(©MMXXIV \s "Ismael \s "Venegas \s "Castelló.) \n \n $1
 
 @parse-byte ( str* -: val* )
 	[ LIT2r 0000 ]
