@@ -9,7 +9,8 @@
 	-[ ] Store each byte.
 )
 
-%debug ( -- ) { .DEBUG #00 EQU }
+%NOT ( -- ) { #00 EQU }
+%debug ( -- ) { .DEBUG NOT }
 %DBG ( -- ) { #010e DEO }
 %DBG! ( -- ) { #010e DEO #010f DEO BRK }
 %space ( -- ) { [ LIT2 \s -Console/write ] DEO }
@@ -20,17 +21,17 @@
 %SP { #20 }  %\s { 20 }
 
 |10 @Console &vector $2 &read $1 &pad $5 &write $1 &error $1
-|a0 @File &vector $2 &success $2 &stat $2 &delete $1 &append $1 &name $2 &length $2 &read $2 &write $2
 
 |01 @DEBUG
 
 |000
 
 @input-buffer-pointer $2
+@here-current $2
+@here-pointer $2
 
 |100 ( -> )
-	{ "0080 $1 } STH2r parse-byte
-	;here DUP2 SWP2 STA2
+	;here .here-pointer STZ2
 	;input-buffer .input-buffer-pointer STZ2
 	<print-banner>
 	<print-memory-usage>
@@ -56,13 +57,13 @@ BRK
 	&<print-first-prompt> ( -- )
 		( this just skips the first newline, I will make it better later :P )
 		;&prompt-start INC2 <print-string>
-		;here LDA2 <print-short>
+		.here-pointer LDZ2 <print-short>
 		;&prompt-end <print-string>
 		JMP2r
 
 	&<print-prompt> ( -- )
 		;&prompt-start <print-string>
-		;here LDA2 <print-short>
+		.here-pointer LDZ2 <print-short>
 		;&prompt-end <print-string>
 		JMP2r
 
@@ -75,14 +76,14 @@ BRK
 	DUP SP NEQ ?{ POP BRK ( ignore ) }
 	DUP NL EQU ?{
 		.input-buffer-pointer LDZ2 STA
-		.input-buffer-pointer LDZ2 INC2 .input-buffer-pointer STZ2
-		;here DUP2 LDA2 INC2 SWP2 STA2 BRK }
+		.input-buffer-pointer LDZ2 INC2 .input-buffer-pointer STZ2  BRK }
 	POP ( consume last newline )
+	assemble-bytecode
 	;input-buffer .input-buffer-pointer STZ2
+	.here-current LDZ2 JSR2
 	debug ?{
 		DBG
-		;input-buffer <print-memory> }
-	parse-input-buffer
+		;here <print-memory> ( ;input-buffer <print-memory> ) }
 	Repl/read BRK
 
 @<print-string> ( string* -- )
@@ -112,15 +113,25 @@ BRK
 	;&banner <print-string>
 	JMP2r
 
-	&banner "Monocycle Varvara/Uxn Concatenated Interpretive Uxntal Assembler REPL \s "(©MMXXIV \s "Ismael \s "Venegas \s "Castelló.) \n \n $1
+	&banner "
+		"Monocycle \s "CLI \s "REPL \s "Version \s "0.1 \n
+		"Varvara/Uxn \s "Concatenated \s "Interpretive \s
+		"Uxntal \s "JIT \s "Assembler \n
+	"(©MMXXIV \s "Ismael \s "Venegas \s "Castelló, \s "MIT \s "License.) \n $1
 
-@parse-byte ( str* -: val* )
-	[ LIT2r 0000 ]
-	&w ( str* `acc* -- val )
-	LDAk parse-nibble INC #00 EQU ?{
-		[ LITr 40 ] SFT2r LDAk parse-nibble [ LITr 00 ] STH
-		ADD2r INC2 LDAk ?&w }
-	POP2 STH2r JMP2r
+@assemble-bytecode ( -: val* )
+		.here-pointer LDZ2 .here-current STZ2
+        [ LIT2r 0000 ] ;input-buffer
+        &w ( str* `acc* -: val* )
+        LDAk parse-nibble INC #00 EQU ?{
+                [ LITr 40 ] SFT2r LDAk parse-nibble [ LITr 00 ] STH
+                ADD2r INC2
+                [ LIT2 &count 0200 ] INC DUP2 ,&count STR2
+                GTH ?{ #0200 ,&count STR2
+                STHkr .here-pointer LDZ2 STA
+                .here-pointer LDZ2 INC2 .here-pointer STZ2 }
+                LDAk ?&w }
+        POP2r POP2 JMP2r
 
 @parse-nibble ( c -- val! )
 	( dec ) [ LIT "0 ] SUB DUP #09 GTH ?{ JMP2r }
@@ -155,13 +166,6 @@ BRK
     newline
     JMP2r
 ]
-
-@parse-input-buffer ( -- )
-	;input-buffer
-	&loop
-		LDA2k parse-byte
-		INC2 INC2 LDAk DBG ?&loop
-	POP2 JMP2r
 
 @paddr ( addr* -- )  <print-short> space  JMP2r
 
