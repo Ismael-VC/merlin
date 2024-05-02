@@ -20,9 +20,10 @@
 %NL { #0a }  %\n { 0a }
 %SP { #20 }  %\s { 20 }
 
+|00 @System &vector $2 &wst $1 &rst $1 &pad $4 &r $2 &g $2 &b $2 &debug $1 &halt $1
 |10 @Console &vector $2 &read $1 &pad $5 &write $1 &error $1
 
-|01 @DEBUG
+|00 @DEBUG
 
 |000
 
@@ -31,6 +32,9 @@
 @here-pointer $2
 
 |100 ( -> )
+    #3ae8 .System/r DEO2
+    #0a53 .System/g DEO2
+    #2927 .System/b DEO2
 	;here .here-pointer STZ2
 	;input-buffer .input-buffer-pointer STZ2
 	<print-banner>
@@ -74,16 +78,24 @@ BRK
 @on-input ( -> )
 	.Console/read DEI
 	DUP SP NEQ ?{ POP BRK ( ignore ) }
+	DUP LIT "( NEQ ?{ #00 ,&comment STR POP BRK }
+	DUP LIT ") NEQ ?{ #01 ,&comment STR POP BRK }
 	DUP NL EQU ?{
+		[ LIT &comment 01 ] ?{
+			POP BRK }
 		.input-buffer-pointer LDZ2 STA
 		.input-buffer-pointer LDZ2 INC2 .input-buffer-pointer STZ2  BRK }
 	POP ( consume last newline )
 	assemble-bytecode
+	#6c .here-pointer LDZ2 STA
+	.here-pointer LDZ2 INC2 .here-pointer STZ2
 	;input-buffer .input-buffer-pointer STZ2
 	.here-current LDZ2 JSR2
+	;input-buffer #0080 <mclr>
+	DBG
 	debug ?{
-		DBG
-		;here <print-memory> ( ;input-buffer <print-memory> ) }
+		{ \n "@here: \n $1 } STH2r <print-string>
+		;here <print-memory> }
 	Repl/read BRK
 
 @<print-string> ( string* -- )
@@ -98,6 +110,13 @@ BRK
 	&<nibble> ( byte -- )
 		#0f AND DUP #09 GTH #27 MUL ADD [ LIT "0 ] ADD #18 DEO
 		JMP2r
+
+@<mclr> ( src* len* -- )
+	OVR2 ADD2 SWP2
+	&l ( -- )
+		LITr 00 STH2k STAr
+		INC2 GTH2k ?&l
+	POP2 POP2 JMP2r
 
 @<print-memory-usage> ( -- )
 	;here <print-short>
@@ -117,7 +136,8 @@ BRK
 		"Monocycle \s "CLI \s "REPL \s "Version \s "0.1 \n
 		"Varvara/Uxn \s "Concatenated \s "Interpretive \s
 		"Uxntal \s "JIT \s "Assembler \n
-	"(©MMXXIV \s "Ismael \s "Venegas \s "Castelló, \s "MIT \s "License.) \n $1
+		"(© \s "MMXXIV \s "Ismael \s "Venegas \s "Castelló, \s
+		"MIT \s "License.) \n $1
 
 @assemble-bytecode ( -: val* )
 		.here-pointer LDZ2 .here-current STZ2
