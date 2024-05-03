@@ -1,196 +1,170 @@
-(
-	# TODO:
-
-	-[x] Ignore spaces in input.
-	-[x] Write input to buffer for parsing.
-	-[ ] Check buffer is not overflowed.
-	-[ ] Keep track of how many bytes I write to the buffer.
-	-[ ] Parse each byte.
-	-[ ] Store each byte.
-)
-
-%NOT ( -- ) { #00 EQU }
-%debug ( -- ) { .DEBUG NOT }
+( macros )
 %DBG ( -- ) { #010e DEO }
 %DBG! ( -- ) { #010e DEO #010f DEO BRK }
-%space ( -- ) { [ LIT2 \s -Console/write ] DEO }
-%newline ( -- ) { [ LIT2 \n -Console/write ] DEO }
-%bar ( -- ) { [ LIT2 "| -Console/write ] DEO }
-%emit ( c -- ) { #18 DEO }
+%<space> ( -- ) { [ LIT2 \s -Console/write ] DEO }
+%<newline> ( -- ) { [ LIT2 \n -Console/write ] DEO }
+%<emit> ( c -- ) { #18 DEO }
 %NL { #0a }  %\n { 0a }
 %SP { #20 }  %\s { 20 }
 
-|00 @System &vector $2 &wst $1 &rst $1 &pad $4 &r $2 &g $2 &b $2 &debug $1 &halt $1
+( devices )
+|0 @System 
+  &vector $2 &wst $1 &rst $1 &pad $4 &r $2 &g $2 &b $2 &debug $1 &halt $1
 |10 @Console &vector $2 &read $1 &pad $5 &write $1 &error $1
 
-|00 @DEBUG
+( constants )
+|0 @DEBUG ( set to |0 to enable debugging )
 
-|000
+( zero page )
+|0 @input $80  @expression $80
 
-@input-buffer-pointer $2
-@here-current $2
-@here-pointer $2
-
+( program )
 |100 ( -> )
-    #3ae8 .System/r DEO2
-    #0a53 .System/g DEO2
-    #2927 .System/b DEO2
-	;here .here-pointer STZ2
-	;input-buffer .input-buffer-pointer STZ2
-	<print-banner>
-	<print-memory-usage>
-	Repl/<print-first-prompt>
-	;on-input .Console/vector DEO2
-	BRK
+  ( set theme )
+  #2ae7 .System/r DEO2
+  #0a52 .System/g DEO2
+  #2a37 .System/b DEO2
 
-BRK
+  ( set pointers )
+  ;heap ;heap-ptr STA2
+  ;input ;input-ptr STA2
+  ;expression ;expression-ptr STA2
+  
+  ( init repl )
+  ;banner <print-string>
+  <print-memory-usage>
+  <print-prompt>
+  ;REPL .Console/vector DEO2
+  BRK
 
-@Repl
-	&read ( buffer* -- )
-		/<print-prompt>
+@REPL ( char -> )
+  ( Read )
+  .Console/read DEI
+  DUP SP NEQ ?{ POP BRK ( ignore ) }
+  DUP LIT "@ NEQ ?{ #01 ;&assemble STA POP BRK }
+  DUP LIT "[ NEQ ?{ #00 ,&multi-line STR POP BRK }
+  DUP LIT "] NEQ ?{ #01 ,&multi-line STR POP BRK }
+  DUP LIT "( NEQ ?{ #00 ,&comment STR POP BRK }
+  DUP LIT ") NEQ ?{ #01 ,&comment STR POP BRK }
+  DUP NL EQU ?{
+    [ LIT &comment 01 ] ?{
+      POP BRK }
+    ;input-ptr LDA2 STA
+    ;input-ptr LDA2 INC2 ;input-ptr STA2  BRK }
+  [ LIT &multi-line 01 ] ?{
+    POP BRK }
+  POP ( consume last newline )
+  assemble-bytecode
+  ;REPL/assemble LDA ?{
+    ( assemble expression return jump )
+    #a0 ;expression-ptr LDA2 STA
+    ;REPL/expression-return ;expression-ptr LDA2 INC2 STA2 
+    #2c ;expression-ptr LDA2 INC2 INC2 INC2 STA
+    ( reset expression-ptr )
+    ;expression ;expression-ptr STA2 }
+  ;input ;input-ptr STA2 ( reset input-ptr )
 
-	&eval
+  ( Eval )
+  [ LIT &assemble $1 ] ?{
+    ;expression JMP2 }
+  &expression-return
+  #00 ,&assemble STR
+  .DEBUG ?{
+    { \n "@input \s "& \s "@expression: \n $1 } STH2r <print-string>
+    ;input <print-memory> <newline> }
+  ;input #0100 <mclr>
 
+  ( Print )
+  DBG
+  .DEBUG ?{
+    { \n "@heap: \n $1 } STH2r <print-string>
+    ;heap <print-memory> }
 
-	&print
+  ( Loop )
+  <print-prompt> BRK
 
-
-	&loop
-		JMP2r
-
-	&<print-first-prompt> ( -- )
-		( this just skips the first newline, I will make it better later :P )
-		;&prompt-start INC2 <print-string>
-		.here-pointer LDZ2 <print-short>
-		;&prompt-end <print-string>
-		JMP2r
-
-	&<print-prompt> ( -- )
-		;&prompt-start <print-string>
-		.here-pointer LDZ2 <print-short>
-		;&prompt-end <print-string>
-		JMP2r
-
-	&prompt-start \n "փ \s "[ $1
-	&prompt-end   "]> \s $1
-
-
-@on-input ( -> )
-	.Console/read DEI
-	DUP SP NEQ ?{ POP BRK ( ignore ) }
-	DUP LIT "( NEQ ?{ #00 ,&comment STR POP BRK }
-	DUP LIT ") NEQ ?{ #01 ,&comment STR POP BRK }
-	DUP NL EQU ?{
-		[ LIT &comment 01 ] ?{
-			POP BRK }
-		.input-buffer-pointer LDZ2 STA
-		.input-buffer-pointer LDZ2 INC2 .input-buffer-pointer STZ2  BRK }
-	POP ( consume last newline )
-	assemble-bytecode
-	#6c .here-pointer LDZ2 STA
-	.here-pointer LDZ2 INC2 .here-pointer STZ2
-	;input-buffer .input-buffer-pointer STZ2
-	.here-current LDZ2 JSR2
-	;input-buffer #0080 <mclr>
-	DBG
-	debug ?{
-		{ \n "@here: \n $1 } STH2r <print-string>
-		;here <print-memory> }
-	Repl/read BRK
-
-@<print-string> ( string* -- )
-	LDAk .Console/write DEO
-	INC2 LDAk ?<print-string>
-	POP2 JMP2r
-
-@<print-short> ( short* -- )
-	SWP /<byte>
-	&<byte> ( byte -- )
-		DUP #04 SFT /<nibble>
-	&<nibble> ( byte -- )
-		#0f AND DUP #09 GTH #27 MUL ADD [ LIT "0 ] ADD #18 DEO
-		JMP2r
-
-@<mclr> ( src* len* -- )
-	OVR2 ADD2 SWP2
-	&l ( -- )
-		LITr 00 STH2k STAr
-		INC2 GTH2k ?&l
-	POP2 POP2 JMP2r
+@banner [
+  \s \s \s "█▄   \s \s "Monocycle \s "CLI \s "REPL \s "Version \s "0.1 \n
+  \s "▐ \s "█ \s "▌ \s "Varvara/Uxn \s "Concatenated \s "Interpretive \s
+                       "Uxntal \s "JIT \s "Assembler \n
+  \s \s   "▀█ \s \s \s "(© \s "MMXXIV \s "Ismael \s "Venegas \s "Castelló, \s 
+                       "MIT \s "License.) \n \s \s \s \s \s \s \s $1 ]
 
 @<print-memory-usage> ( -- )
-	;here <print-short>
-	;&used <print-string>
-	;end ;here SUB2 <print-short>
-	;&free <print-string>
-	JMP2r
+  ;end ;heap-ptr LDA2 SUB2 <print-short>
+  ;&free <print-string>
+  JMP2r
+    &free [ \s "bytes \s "free. \n $1 ]
 
-	&used \s "bytes \s "used, \s $1
-	&free \s "bytes \s "free. \n \n $1
+@<print-prompt> ( -- )
+  ;&prompt-start <print-string>
+  ;heap-ptr LDA2 <print-short>
+  ;&prompt-end <print-string>
+  JMP2r
+    &prompt-start \n "փ \s "[ $1
+    &prompt-end   "]> \s $1
 
-@<print-banner> ( -- )
-	;&banner <print-string>
-	JMP2r
+( library )
+@<print-string> ( string* -- )
+  LDAk .Console/write DEO
+  INC2 LDAk ?<print-string>
+  POP2 JMP2r
 
-	&banner "
-		"Monocycle \s "CLI \s "REPL \s "Version \s "0.1 \n
-		"Varvara/Uxn \s "Concatenated \s "Interpretive \s
-		"Uxntal \s "JIT \s "Assembler \n
-		"(© \s "MMXXIV \s "Ismael \s "Venegas \s "Castelló, \s
-		"MIT \s "License.) \n $1
+@<print-short> ( short* -- )
+  SWP /byte
+  &byte ( byte -- ) DUP #04 SFT /<nibble>
+  &<nibble> ( byte -- ) #0f AND DUP #09 GTH #27 MUL ADD [ LIT "0 ] ADD #18 DEO
+  JMP2r
 
-@assemble-bytecode ( -: val* )
-		.here-pointer LDZ2 .here-current STZ2
-        [ LIT2r 0000 ] ;input-buffer
-        &w ( str* `acc* -: val* )
-        LDAk parse-nibble INC #00 EQU ?{
-                [ LITr 40 ] SFT2r LDAk parse-nibble [ LITr 00 ] STH
-                ADD2r INC2
-                [ LIT2 &count 0200 ] INC DUP2 ,&count STR2
-                GTH ?{ #0200 ,&count STR2
-                STHkr .here-pointer LDZ2 STA
-                .here-pointer LDZ2 INC2 .here-pointer STZ2 }
-                LDAk ?&w }
-        POP2r POP2 JMP2r
+@<mclr> ( src* len* -- )
+  OVR2 ADD2 SWP2
+  &>loop ( -- )
+    LITr 00 STH2k STAr
+    INC2 GTH2k ?&>loop
+  POP2 POP2 JMP2r
+
+@assemble-bytecode ( buff* -- val* )
+  [ LIT2r 0000 ] ;input
+  &>loop ( str* `acc* -: val* )
+    LDAk parse-nibble INC #00 EQU ?{
+      [ LITr 40 ] SFT2r LDAk parse-nibble [ LITr 00 ] STH
+      ADD2r INC2
+      [ LIT2 &count 0200 ] INC DUP2 ,&count STR2
+      GTH ?{ #0200 ,&count STR2
+        STHkr ;REPL/assemble LDA ?{ 
+          ;expression-ptr LDA2 STA
+          ;expression-ptr LDA2 INC2 ;expression-ptr STA2 !&continue }
+        ;heap-ptr LDA2 STA
+        ;heap-ptr LDA2 INC2 ;heap-ptr STA2 }
+        &continue
+    LDAk ?&>loop }
+  POP2r POP2 JMP2r
 
 @parse-nibble ( c -- val! )
-	( dec ) [ LIT "0 ] SUB DUP #09 GTH ?{ JMP2r }
-	( hex ) #27 SUB DUP #0f GTH ?{ JMP2r }
-	( err ) POP #ff JMP2r
+  ( dec ) [ LIT "0 ] SUB DUP #09 GTH ?{ JMP2r }
+  ( hex ) #27 SUB DUP #0f GTH ?{ JMP2r }
+  ( err ) POP #ff JMP2r
 
-@<print-memory> ( addr* -- ) [
-    STH2k
-    DUP2 paddr space
-    #0000
-    &>loop-bytes
-        ADD2k LDA <print-short>/<byte>
-        DUP #0f AND
-        DUP #07 NEQ ?{ space }
-        #0f NEQ ?{
-            space space
-            bar
-            OVR2 OVR2 ADD2 DUP2 #000f SUB2
-            &>loop-chars
-                LDAk
-                DUPk SP GTH SWP #7f LTH AND ?{
-                    POP LIT ". }
-                emit
-                INC2 GTH2k ?&>loop-chars
-            POP2 POP2
-            bar
-            newline
-            DUP2 INC2 STH2kr ADD2 paddr }
-        space
-        INC NEQk ?&>loop-bytes
-    POP2 POP2 POP2r
-    newline
-    JMP2r
-]
+@<print-memory> ( addr* -- )
+  STH2k DUP2 <print-short> <space> <space> #0000
+  &>loop-bytes
+    ADD2k LDA <print-short>/byte
+    DUP #0f AND DUP #07 NEQ ?{ <space> }
+    #0f NEQ ?{
+      <space> <space> [ LIT2 "| -Console/write ] DEO
+      OVR2 OVR2 ADD2 DUP2 #000f SUB2
+      &>loop-chars
+        LDAk DUPk SP GTH SWP #7f LTH AND ?{
+          POP LIT ". }
+        <emit> INC2 GTH2k ?&>loop-chars
+      POP2 POP2
+      [ LIT2 "| -Console/write ] DEO <newline> DUP2 INC2 STH2kr ADD2 
+      <print-short> <space> }
+    <space> INC NEQk ?&>loop-bytes
+  POP2 POP2 POP2r <newline> JMP2r
 
-@paddr ( addr* -- )  <print-short> space  JMP2r
+( pointers )
+@input-ptr $2  @heap-ptr $2  @expression-ptr $2
 
-@here
-
-|ff7f @end
-
-@input-buffer $80
+( heap )
+@heap |ffff @end
