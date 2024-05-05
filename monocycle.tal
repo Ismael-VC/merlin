@@ -8,12 +8,12 @@
 %SP { #20 }  %\s { 20 }
 
 ( devices )
-|0 @System 
+|0 @System
   &vector $2 &wst $1 &rst $1 &pad $4 &r $2 &g $2 &b $2 &debug $1 &halt $1
 |10 @Console &vector $2 &read $1 &pad $5 &write $1 &error $1
 
 ( constants )
-|0 @DEBUG ( set to |0 to enable debugging )
+|1 @DEBUG ( set to |0 to enable debugging )
 
 ( zero page )
 |0 @input $80  @expression $80
@@ -29,7 +29,7 @@
   ;heap ;heap-ptr STA2
   ;input ;input-ptr STA2
   ;expression ;expression-ptr STA2
-  
+
   ( init repl )
   ;banner <print-string>
   <print-memory-usage>
@@ -58,7 +58,7 @@
   ;REPL/assemble LDA ?{
     ( assemble expression return jump )
     #a0 ;expression-ptr LDA2 STA
-    ;REPL/expression-return ;expression-ptr LDA2 INC2 STA2 
+    ;REPL/expression-return ;expression-ptr LDA2 INC2 STA2
     #2c ;expression-ptr LDA2 INC2 INC2 INC2 STA
     ( reset expression-ptr )
     ;expression ;expression-ptr STA2 }
@@ -84,11 +84,11 @@
   <print-prompt> BRK
 
 @banner [
-  \s \s \s "█▄   \s \s "Monocycle \s "CLI \s "REPL \s "Version \s "0.1 \n
-  \s "▐ \s "█ \s "▌ \s "Varvara/Uxn \s "Concatenated \s "Interpretive \s
-                       "Uxntal \s "JIT \s "Assembler \n
-  \s \s   "▀█ \s \s \s "(© \s "MMXXIV \s "Ismael \s "Venegas \s "Castelló, \s 
-                       "MIT \s "License.) \n \s \s \s \s \s \s \s $1 ]
+   \s \s "█▄   \s \s "Monocycle \s "CLI \s "REPL \s "Version \s "0.2 \n
+   "▐ \s "█ \s "▌ \s "Varvara/Uxn \s "Concatenated \s "Interpretive \s
+                     "Uxntal \s "JIT \s "Assembler. \n
+   \s   "▀█ \s \s \s "©MMXXIV \s "Ismael \s "Venegas \s "Castelló, \s
+                     "MIT \s "License. \n \s \s \s \s \s \s $1 ]
 
 @<print-memory-usage> ( -- )
   ;end ;heap-ptr LDA2 SUB2 <print-short>
@@ -123,7 +123,7 @@
     INC2 GTH2k ?&>loop
   POP2 POP2 JMP2r
 
-@assemble-bytecode ( buff* -- val* )
+@assemble-bytecode ( -- val* )
   [ LIT2r 0000 ] ;input
   &>loop ( str* `acc* -: val* )
     LDAk parse-nibble INC #00 EQU ?{
@@ -131,7 +131,7 @@
       ADD2r INC2
       [ LIT2 &count 0200 ] INC DUP2 ,&count STR2
       GTH ?{ #0200 ,&count STR2
-        STHkr ;REPL/assemble LDA ?{ 
+        STHkr ;REPL/assemble LDA ?{
           ;expression-ptr LDA2 STA
           ;expression-ptr LDA2 INC2 ;expression-ptr STA2 !&continue }
         ;heap-ptr LDA2 STA
@@ -158,7 +158,7 @@
           POP LIT ". }
         <emit> INC2 GTH2k ?&>loop-chars
       POP2 POP2
-      [ LIT2 "| -Console/write ] DEO <newline> DUP2 INC2 STH2kr ADD2 
+      [ LIT2 "| -Console/write ] DEO <newline> DUP2 INC2 STH2kr ADD2
       <print-short> <space> }
     <space> INC NEQk ?&>loop-bytes
   POP2 POP2 POP2r <newline> JMP2r
