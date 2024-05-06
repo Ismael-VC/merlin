@@ -1,0 +1,2 @@
+- fix `փ [0472]> 00` how to recover from that? This could also happen when evaluating a vector.
+- fix dump routine not showing 16th char/byte from row.
