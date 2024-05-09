@@ -26,7 +26,7 @@
   $2 &read $2 &write $2
 
 ( constants )
-|1 @DEBUG ( set to |0 to enable debugging )
+|0 @DEBUG ( set to |0 to enable debugging )
 
 ( zero page )
 |0000 @input $80  @expression $80
@@ -107,9 +107,9 @@
   <print-prompt> BRK
 
 @banner [
-   \s \s "█▄   \s \s NAME
+   \s \s "█ "▄ \s \s NAME
    "▐ \s "█ \s "▌ \s DESCRIPTION
-   \s   "▀█ \s \s \s AUTHOR
+   \s "▀ "█ \s \s \s AUTHOR
    \s \s \s \s \s \s ( "Type \s ""help" \s "for \s "help. \s )
 
 @<print-memory-usage> ( -- )
@@ -169,12 +169,12 @@
 
 @<print-memory> ( addr* -- )
   STH2k DUP2 <print-short> <space> <space> #0000
-  &>loop-bytes
+  &>loop-bytes ( addr* i* | addr* -- )
     ADD2k LDA <print-short>/byte
     DUP #0f AND DUP #07 NEQ ?{ <space> }
     #0f NEQ ?{
       <space> <space> [ LIT2 "| -Console/write ] DEO
-      OVR2 OVR2 ADD2 DUP2 #000f SUB2
+      ADD2k DUP2 INC2 SWP2 #000f SUB2
       &>loop-chars
         LDAk DUPk SP GTH SWP #7f LTH AND ?{
           POP LIT ". }
@@ -184,6 +184,18 @@
       <print-short> <space> }
     <space> INC NEQk ?&>loop-bytes
   POP2 POP2 POP2r <newline> JMP2r
+
+( assembler )
+
+(
+@on-reset ( -> )
+        ;meta #06 DEO2
+        .Console/type DEI ?{
+                ;dict/usage <pstr>
+                [ LIT2 01 -live ] STZ }
+        ;on-init-src .Console/vector DEO2
+        BRK
+)
 
 @on-init-src ( -> )
 	;Console/read DEI ;src zkey ?{ BRK }
