@@ -7,7 +7,8 @@
 %AUTHOR { "©07e8 \s "Ismael \s "Venegas \s "Castelló, \s "MIT \s "License. \n }
 
 %DBG ( -- ) { #010e DEO }
-%DBG! ( -- ) { #010e DEO #010f DEO BRK }
+%HLT ( -- ) { #010f DEO BRK }
+%DBG! ( -- ) { DBG HLT }
 %<space> ( -- ) { [ LIT2 \s -Console/write ] DEO }
 %<newline> ( -- ) { [ LIT2 \n -Console/write ] DEO }
 %<emit> ( c -- ) { #18 DEO }
@@ -191,13 +192,12 @@
 
 ( assembler )
 @on-init-src ( -> )
-	;Console/read DEI ;src zkey ?{ BRK }
+	.Console/read DEI ;src store-key ?{ BRK }
 	;on-init-dst .Console/vector DEO2
-	;assembler-vars <print-memory>
 	BRK
 
 @on-init-dst ( -> )
-	.Console/read DEI ;dst zkey ?{ BRK }
+	.Console/read DEI ;dst store-key ?{ BRK }
 	<assemble>
 	;live LDA ?{
 		#80 ;halt LDA ORA #0f DEO
@@ -207,7 +207,7 @@
 	BRK
 
 @on-live ( -> )
-	.Console/read DEI ;src zkey ?{ BRK }
+	.Console/read DEI ;src store-key ?{ BRK }
 	( | cleanup )
 	#00 ;halt STA
 	#0000 ;length STA2
@@ -254,7 +254,7 @@
 	JMP2r
 
 @handle-char ( c -- )
-	;token zkey ?{ JMP2r }
+	;token store-key ?{ JMP2r }
 	;token/buf DUP2 parse-token !<sclr>
 
 (
@@ -549,18 +549,58 @@
 	.File/read DEO2
 	.File/success DEI2 #0000 EQU2 JMP2r
 
-@store-key ( key buffer* -- proc )
-	ROTk NIP NIP #21 LTH ?&eval
-	LDAk #2f EQU ?&overflow
-	( write char ) STH
-	#00 STHkr LDAk ADD INC STA2
-	( incr len ) STHr LDAk INC SWP STA
-	#00 JMP2r
-	&overflow ( key ztr -- proc )
-	;err/token <set-error>
-	&eval ( key buffer* -- proc )
-	ROT POP LDAk #00 ROT STA ( c 0  )
-	JMP2r
+
+(
+    @store-key
+
+  Stores a char into a counted buffer and returns zero, a char < 0x21 resets the counted
+  buffer length to zero and returns the length. If the input string is longer than 0x30
+  a buffer overflow error is shown.
+
+  Arguments:
+
+    - key: char
+    - buffer*: counted buffer.
+
+  Example:
+
+    > @foo &len $1 buf $30
+
+    > [ LIT "f ] ;foo store-key
+
+    > [ LIT "o ] ;foo store-key
+
+    > [ LIT "o ] ;foo store-key
+
+    > ;foo #0010 <print-memory>
+    0f20  03 66 6f 6f 00 00 00 00  00 00 00 00 00 00 00 00  |.foo............|
+    0f30
+
+    > ( newline ) #0a ;foo store-key
+
+    > <print-stacks>
+    WST 00 00 00 00 00 00 00 00 00 00 00 00|00 00 00 03 <
+    RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+    > ;foo #0010 <print-memory>
+    0f20  00 66 6f 6f 00 00 00 00  00 00 00 00 00 00 00 00  |.foo............|
+    0f30
+)
+@store-key ( key buffer* -- proc ) [
+  ROTk NIP NIP #21 LTH ?&eval
+  LDAk #2f EQU ?&overflow
+  ( write char ) STH2
+  #00 STH2kr LDAk #00 SWP ADD2 INC2 STA2
+  ( incr len ) STH2r LDAk INC ROT ROT STA
+  #00 JMP2r
+
+    &overflow ( key buffer* -- proc )
+      ;err/overflow <set-error>
+
+    &eval ( key buffer* -- proc )
+      ROT POP LDAk #00 SWP2 STA
+      JMP2r
+]
 
 @scap ( str* -: end* )
 	INC2 & LDAk ?scap
@@ -628,7 +668,7 @@
 
 @dict &usage "usage: 20 "drifblim.rom 20 "in.tal 20 "out.rom 0a $1
 	&unused "-- 20 "Unused: 20 $1
-	&reset "RESET $1
+	&reset "on-reset $1
 	&assembled "Assembled 20 $1
 	&in 20 "in 20 $1
 	&bytes 20 "bytes( $1
@@ -649,6 +689,7 @@
 	&opcode "Opcode $1
 	&nested "Nested $1
 	&zeropage "Zero-page $1
+	&overflow "Overflow $1
 
 @opcodes [
 	"LIT "INC "POP "NIP "SWP "ROT "DUP "OVR
@@ -685,8 +726,8 @@
 	&symbols ( addr*, refs, name[], 00 )
 
 @assembler-vars [
-  @src $1 &buf $30
-  @dst $1 &buf $30
+  @src &len $1 &buf $30
+  @dst &len $1 &buf $30
   @token $1 &buf $30
   @scope $30
   @sublabel $30
