@@ -46,20 +46,50 @@
 %\t { 09 }
 
 (
-    %\s ( -- )
+    %\t ( -- )
+
+  Indicate a tab in a raw string, used instead of: `09`.
+
+  # Examples
+    > @foo [
+      "This \s "is \s "the \s "first \s "line, \n
+      \t "The \s "second \s "line \s "is \s "tabbed. \n
+      09 "The \s "third \s "line \s "is \s "tabbed. \n \0
+    ] 
+    > ;foo <pstr>
+    This is the first line,
+        The second line is tabbed.
+        The third line is tabbed.
 )
 %\s { 20 }
+
+(
+    %\t ( -- )
+
+  Indicate a tab in a raw string, used instead of: `0a`.
+
+  # Examples
+    > @foo [
+      "This \s "is \s "the \s "first \s "line, \n
+      \t "The \s "second \s "line \s "is \s "tabbed. \n
+      09 "The \s "third \s "line \s "is \s "tabbed. \n \0
+    ] 
+    > ;foo <pstr>
+    This is the first line,
+        The second line is tabbed.
+        The third line is tabbed.
+)
 %\n { 0a }
 
 (
     %NL ( -- )
 
-  Push the ASCII value of new line (0x0a) to the stack.
+  Push the ASCII value of new line (`#0a`) to the stack.
 
   # Examples
-    > NL <emit> #0a <emit>
-
-
+    > [ LIT "a ] <emit> NL <emit> [ LIT "b ] <emit> #0a <emit>
+    a
+    b
     >
 )
 %NL { #0a }
@@ -67,22 +97,27 @@
 (
     %SP ( -- )
 
-  Push the ASCII value of space (0x20) to the stack.
+  Push the ASCII value of space (`#20`) to the stack.
 
   # Examples
     > [ LIT "a ] <emit> SP <emit> [ LIT "b ] <emit> <newline>
     a b
+    > [ LIT "c ] <emit> #20 <emit> [ LIT "d ] <emit> <newline>
+    c d
 )
 %SP { #20 }
 
 (
     %TB ( -- )
 
-  Push the ASCII value of tab (0x09) to the stack.
+  Push the ASCII value of tab (`#09`) to the stack.
 
   # Examples
     > [ LIT "a ] <emit> <newline> TB <emit> [ LIT "b ] <emit> <newline>
     a
         b
+    > [ LIT "c ] <emit> <newline> #09 <emit> [ LIT "d ] <emit> <newline>
+    c
+        d
 )
 %TB { #09 }

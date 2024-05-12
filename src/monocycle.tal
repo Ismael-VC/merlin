@@ -1,4 +1,4 @@
-~std-macros.tal
+~macros.tal
 ~devices.tal
 ~constants.tal
 ~zero-page.tal
@@ -12,7 +12,7 @@
 ~output.tal
 ~labels.tal
 ~helpers.tal
-~std-library.tal
+~library.tal
 ~assets.tal
 
 @foo [
@@ -22,8 +22,8 @@
 ]
 
 @main ( -- ) [
-  ;foo <pstr>
-
+  [ LIT "a ] <emit> <newline> TB <emit> [ LIT "b ] <emit> <newline>
+[ LIT "c ] <emit> <newline> TB <emit> [ LIT "d ] <emit> <newline>
   HLT
 ]
 
