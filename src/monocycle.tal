@@ -16,14 +16,12 @@
 ~assets.tal
 
 @foo [
-  "This \s "is \s "the \s "first \s "line, \n
-  \t "The \s "second \s "line \s "is \s "tabbed. \n
-  09 "The \s "third \s "line \s "is \s "tabbed. \n \0
-]
+      "This \s "is \s "the \s "first \s "line, \n
+      "This \s "is \s "the \s "second \s "line. 0a
+    ] 
 
 @main ( -- ) [
-  [ LIT "a ] <emit> <newline> TB <emit> [ LIT "b ] <emit> <newline>
-[ LIT "c ] <emit> <newline> TB <emit> [ LIT "d ] <emit> <newline>
+  ;foo <pstr>
   HLT
 ]
 
