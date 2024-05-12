@@ -15,12 +15,15 @@
 ~std-library.tal
 ~assets.tal
 
-@foo "1337 $1
-@bar $10
+@foo "foo \0
+@bar "bar \0
+@baz "foo \0
 
 @main ( -- ) [
-  ;foo shex <phex> <newline>
-	HLT
+  { "foo==bar-> \0 } STH2r <pstr> ;foo ;bar scmp3 <phex>/byte <newline>
+  { "foo \s "== \s "baz \s "-> \s \0 } STH2r <pstr> ;foo ;baz scmp3 <phex>/byte <newline>
+
+  HLT
 ]
 
 ~memory.tal

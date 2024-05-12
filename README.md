@@ -97,17 +97,17 @@ semantics may need to be adapted.
 
 ```
 փ [1337]> @print-dec ( dec -- ) [
-	DUP #64 DIV print-num/try
-	DUP #0a DIV print-num/try
-	( >> )
+  DUP #64 DIV print-num/try
+  DUP #0a DIV print-num/try
+  ( >> )
 ] ( 13 bytes )
 
 փ [1344]> @print-num ( num -- ) [
-	#0a DIVk MUL SUB [ LIT "0 ] ADD #18 DEO
-	JMP2r
-	&try ( num -- )
-		DUP ?print-num
-		POP JMP2r
+  #0a DIVk MUL SUB [ LIT "0 ] ADD #18 DEO
+  JMP2r
+  &try ( num -- )
+    DUP ?print-num
+    POP JMP2r
 ] ( 19 bytes )
 
 փ [1357]> #2a print-dec
