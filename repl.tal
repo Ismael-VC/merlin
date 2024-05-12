@@ -1,0 +1,89 @@
+
+@REPL ( char -> )
+  ( Read )
+  .Console/read DEI
+  DUP SP NEQ ?{ POP BRK ( ignore ) }
+  DUP LIT "@ NEQ ?{ #01 ;&assemble STA POP BRK }
+  DUP LIT "[ NEQ ?{ #00 ,&multi-line STR POP BRK }
+  DUP LIT "] NEQ ?{ #01 ,&multi-line STR POP BRK }
+  DUP LIT "( NEQ ?{ #00 ,&comment STR POP BRK }
+  DUP LIT ") NEQ ?{ #01 ,&comment STR POP BRK }
+  DUP NL EQU ?{
+    [ LIT &comment 01 ] ?{
+      POP BRK }
+    ;input-ptr LDA2 STA
+    ;input-ptr LDA2 INC2 ;input-ptr STA2  BRK }
+  [ LIT &multi-line 01 ] ?{
+    POP BRK }
+  POP ( consume last newline )
+  ( assemble-bytecode ) <assemble>
+  ;REPL/assemble LDA ?{
+    ( assemble expression return jump )
+    #a0 ;expression-ptr LDA2 STA
+    ;REPL/expression-return ;expression-ptr LDA2 INC2 STA2
+    #2c ;expression-ptr LDA2 INC2 INC2 INC2 STA
+    ( reset expression-ptr )
+    ;expression ;expression-ptr STA2 }
+  ;input ;input-ptr STA2 ( reset input-ptr )
+
+  ( Eval )
+  [ LIT &assemble $1 ] ?{
+    ;expression JMP2 }
+  &expression-return
+  #00 ,&assemble STR
+  .DEBUG ?{
+    { \n "@input \s "& \s "@expression: \n $1 } STH2r <pstr>
+    ;input <pmem> <newline> }
+  ;input #0100 <mclr>
+
+  ( Print )
+  DBG
+  .DEBUG ?{
+    { \n "@heap: \n $1 } STH2r <pstr>
+    ;heap <pmem> }
+
+  ( Loop )
+  <print-prompt> BRK
+
+@banner [
+   \s \s "█ "▄ \s \s NAME
+   "▐ \s "█ \s "▌ \s DESCRIPTION
+   \s "▀ "█ \s \s \s AUTHOR
+   \s \s \s \s \s \s ( "Type \s ""help" \s "for \s "help. \s ) 
+]
+
+@<pmem-usage> ( -- )
+  ;end ;heap-ptr LDA2 SUB2 <phex>
+  ;&free <pstr>
+  JMP2r
+    &free [ \s "bytes \s "free. \n \0 ]
+
+@<print-prompt> ( -- )
+  ;&prompt-start <pstr>
+  ;heap-ptr LDA2 <phex>
+  ;&prompt-end <pstr>
+  JMP2r
+    &prompt-start \n "փ \s "[ \0
+    &prompt-end   "]> \s \0
+
+@assemble-bytecode ( -- val* )
+  [ LIT2r 0000 ] ;input
+  &>loop ( str* `acc* -: val* )
+    LDAk parse-nibble INC #00 EQU ?{
+      [ LITr 40 ] SFT2r LDAk parse-nibble [ LITr 00 ] STH
+      ADD2r INC2
+      [ LIT2 &count 0200 ] INC DUP2 ,&count STR2
+      GTH ?{ #0200 ,&count STR2
+        STHkr ;REPL/assemble LDA ?{
+          ;expression-ptr LDA2 STA
+          ;expression-ptr LDA2 INC2 ;expression-ptr STA2 !&continue }
+        ;heap-ptr LDA2 STA
+        ;heap-ptr LDA2 INC2 ;heap-ptr STA2 }
+        &continue
+    LDAk ?&>loop }
+  POP2r POP2 JMP2r
+
+@parse-nibble ( c -- val! )
+  ( dec ) [ LIT "0 ] SUB DUP #09 GTH ?{ JMP2r }
+  ( hex ) #27 SUB DUP #0f GTH ?{ JMP2r }
+  ( Error ) POP #ff JMP2r

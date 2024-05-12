@@ -1,0 +1,32 @@
+(
+@|mem )
+( pointers )
+@input-ptr $2
+@heap-ptr $2
+@expression-ptr $2
+
+@Lambda/buf $100
+
+@mem ( buffers ) [
+  &include $30
+  &symbols ( addr*, refs, name[], 00 )
+]
+
+@assembler-vars [
+  @src &len $1 &buf $30
+  @dst &len $1 &buf $30
+  @token $1 &buf $30
+  @scope $30
+  @sublabel $30
+  @live $1
+  @scan $1
+  @head $2
+  @halt $1
+  @length $2
+]
+
+( heap )
+@heap
+
+|8000 @rom $100 &output
+|ffff @end

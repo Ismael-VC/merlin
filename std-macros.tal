@@ -1,0 +1,17 @@
+( macros )
+%VERSION { "00.03 }  %DATE { "05/05/07e8-17:14:0e }
+%NAME { "Monocycle \s "CLI \s "REPL \t "Version \s VERSION \s 28 DATE 29 \n }
+%DESCRIPTION {
+  "Varvara/Uxn \s "Concatenated \s "Interpretive \s "Uxntal \s "JIT \s
+  "Assembler. \n }
+%AUTHOR { "©07e8 \s "Ismael \s "Venegas \s "Castelló, \s "MIT \s "License. \n }
+
+%DBG ( -- ) { #010e DEO }
+%HLT ( -- ) { #010f DEO BRK }
+%DBG! ( -- ) { DBG HLT }
+%<space> ( -- ) { [ LIT2 \s -Console/write ] DEO }
+%<newline> ( -- ) { [ LIT2 \n -Console/write ] DEO }
+%<emit> ( c -- ) { #18 DEO }
+%\0 { 00 }  %\t { 09 }
+%NL { #0a }  %\n { 0a }
+%SP { #20 }  %\s { 20 }

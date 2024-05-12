@@ -1,0 +1,45 @@
+(
+@|output )
+
+@<write-rom> ( -: )
+  ;dst/buf .File/name DEO2
+  ;length LDA2 #00ff SUB2 .File/length DEO2
+  ;rom/output .File/write DEO2
+  JMP2r
+
+@<write-sym> ( -- )
+  ;dst/buf DUP2 scap/ ;Info/sym-ext OVR2 <scpy>
+  SWP2 .File/name DEO2
+  ;mem/symbols
+  &>w ( -- )
+    ( addr ) #0002 .File/length DEO2
+    DUP2 .File/write DEO2
+    ( name ) #0003 ADD2 DUP2 slen INC2 STH2k .File/length DEO2
+    DUP2 .File/write DEO2
+    STH2r ADD2 DUP2 #0003 ADD2 LDA ?&>w
+  POP2 #00 ROT ROT STA
+  JMP2r
+
+@<print-summary> ( -- )
+  ( | Print summary )
+  ;<create-symbol>/ptr LDA2 ;mem/symbols
+  &>l ( -- )
+    INC2k INC2 LDA ?&skip
+    #0003 ADD2 LDAk [ LIT "A ] SUB #1a LTH ?&skip
+    LDAk [ LIT 28 ] EQU ?&skip
+    DUP2 ;Info/reset scmp ?&skip
+    ;Info/unused <pstr>/
+    DUP2 <pstr>/
+    #0a18 DEO
+    &skip scap/ INC2 GTH2k ?&>l
+  POP2 POP2
+  ( | result )
+  ;Info/assembled <pstr>/
+  ;dst/buf <pstr>/
+  ( | length )
+  ;Info/in <pstr>/
+  ;length LDA2 #00ff SUB2 <pdec>
+  ;Info/bytes <pstr>/
+  ;<create-symbol>/count LDA2 <pdec>
+  ;Info/labels !<pstr>/
+  

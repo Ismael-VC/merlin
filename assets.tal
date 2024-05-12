@@ -1,0 +1,51 @@
+(
+@|assets )
+@Info [
+  &usage "usage: 20 "drifblim.rom 20 "in.tal 20 "out.rom 0a $1
+  &unused "-- 20 "Unused: 20 $1
+  &reset "on-reset $1
+  &assembled "Assembled 20 $1
+  &in 20 "in 20 $1
+  &bytes 20 "bytes( $1
+  &labels 20 "labels). 0a $1
+  &sym-ext ".sym $1
+  &live "Listening.. 0a $1
+]
+
+@Error [
+  "!! 20 "Error: 20 $1
+  &file "File $1
+  &duplicate "Duplicate $1
+  &number "Number $1
+  &length "Length $1
+  &reference "Reference $1
+  &distance "Distance $1
+  &symbol "Symbol $1
+  &token "Token $1
+  &sublabel "Sublabel $1
+  &opcode "Opcode $1
+  &nested "Nested $1
+  &zeropage "Zero-page $1
+  &overflow "Overflow $1
+]
+
+@opcodes [
+  "LIT "INC "POP "NIP "SWP "ROT "DUP "OVR
+  "EQU "NEQ "GTH "LTH "JMP "JCN "JSR "STH
+  "LDZ "STZ "LDR "STR "LDA "STA "DEI "DEO
+  "ADD "SUB "MUL "DIV "AND "ORA "EOR "SFT
+  &brk "BRK 
+]
+
+@runes [
+  "| =lib/padabs "$ =lib/padrel
+  "} =lib/lambda "( =walk-comment
+  "@ =lib/toplab "& =lib/sublab
+  ", =lib/litrel "_ =lib/rawrel
+  ". =lib/litzep "- =lib/rawzep
+  "; =lib/litabs "= =lib/rawabs
+  "? =lib/litjci "! =lib/litjmi
+  "[ =lib/ignore "] =lib/ignore
+  "# =lib/lithex "" =lib/rawstr
+  "~ =lib/inc    &end
+]

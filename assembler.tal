@@ -1,0 +1,26 @@
+( assembler )
+@on-init-src ( -> )
+  .Console/read DEI ;src store-key ?{ BRK }
+  ;on-init-dst .Console/vector DEO2
+  BRK
+
+@on-init-dst ( -> )
+  .Console/read DEI ;dst store-key ?{ BRK }
+  <assemble>
+  ;live LDA ?{
+    #80 ;halt LDA ORA #0f DEO
+    BRK }
+  ;Info/live <pstr>
+  ;on-live .Console/vector DEO2
+  BRK
+
+@on-live ( -> )
+  .Console/read DEI ;src store-key ?{ BRK }
+  ( | cleanup )
+  #00 ;halt STA
+  #0000 ;length STA2
+  ;mem/symbols ;<create-symbol>/ptr STA2
+  ;Lambda/buf ;Lambda/ptr STA2
+  #0000 ;<create-symbol>/count STA2
+  <assemble>
+  BRK

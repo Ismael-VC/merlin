@@ -1,0 +1,26 @@
+( program )
+|0100 ( -> )
+  main
+  ;meta #06 DEO2
+  .Console/type DEI ?{
+     ;Info/usage <pstr>
+     #01 ;live STA }
+  ;on-init-src .Console/vector DEO2
+  BRK
+  (
+  ( set theme )
+  #2ae7 .System/r DEO2
+  #0a52 .System/g DEO2
+  #2a37 .System/b DEO2
+
+  ( set pointers )
+  ;heap ;heap-ptr STA2
+  ;input ;input-ptr STA2
+  ;expression ;expression-ptr STA2
+
+  ( init repl )
+  ;banner <pstr>
+  <pmem-usage>
+  <print-prompt>
+  ;REPL .Console/vector DEO2 )
+  BRK

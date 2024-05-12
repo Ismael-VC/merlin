@@ -1,0 +1,64 @@
+(
+@|primitives )
+
+@<write-str> ( str* -: )
+  LDAk <write>
+  INC2 & LDAk ?<write-str>
+  POP2 JMP2r
+
+@<write-opcode> ( str* -: )
+  find-opcode !<write>
+
+@<write-lithex> ( str* -: )
+  DUP2 slen NIP
+  ( LIT ) DUP #04 EQU #50 SFT #80 ORA <write>
+  !<write-hex>
+
+@<write-rawhex> ( str* -: )
+  DUP2 slen NIP
+  ( >> )
+
+@<write-hex> ( str* len -- )
+  DUP #02 NEQ ?{ POP shex NIP !<write> }
+  #04 NEQ ?{ shex !<write-short> }
+  POP2 ;Error/number !<set-error>
+
+@<write-call> ( str* opc -: )
+  <write>
+  get-ref ;head LDA2 INC2 INC2 SUB2
+  ( >> )
+
+@<write-short> ( short* -: )
+  SWP <write>
+  ( >> )
+
+@<write> ( byte -: )
+  DUP ;head LDA2 INC2k STH2
+  ;rom ADD2 STA
+  <set-length>
+  STH2r
+  ( >> )
+
+@<set-head> ( v* -: )
+  ;head STA2
+  JMP2r
+
+@<set-error> ( name* -- )
+  ;Error <pstr>
+  <pstr>
+  #2018 DEO
+  ;token/buf <pstr>
+  ;Info/in <pstr>/
+  ;scope <pstr>/
+  #0a18 DEO
+  #01 ;halt STA
+  JMP2r
+
+@<set-length> ( byte -- )
+  ?{ JMP2r }
+  ;scan LDA ?{ JMP2r }
+  ;head LDA2
+  ( ) DUP2 OVR ?{ ;Error/zeropage <set-error> }
+  ( ) #8000 LTH2 ?{ ;Error/length <set-error> }
+  ;length STA2
+  JMP2r
