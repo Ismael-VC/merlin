@@ -15,13 +15,10 @@
 ~library.tal
 ~assets.tal
 
-@foo [
-      "This \s "is \s "the \s "first \s "line, \n
-      "This \s "is \s "the \s "second \s "line. 0a
-    ] 
+@foo "This \s "is \s "a 20 "spaces 20 "example \n \0 
 
 @main ( -- ) [
-  ;foo <pstr>
+  #55 <emit> <space> [ LIT "U ] <emit>
   HLT
 ]
 

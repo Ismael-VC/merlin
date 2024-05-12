@@ -9,15 +9,49 @@
 %DBG ( -- ) { #010e DEO }
 %HLT ( -- ) { #010f DEO BRK }
 %DBG! ( -- ) { DBG HLT }
+
+(
+    %<space> ( -- )
+
+  Emit a space character to standard output.
+
+  # Examples
+    > [ LIT "a ] <emit> <space> [ LIT "b ] <emit> <newline>
+    a b
+)
 %<space> ( -- ) { [ LIT2 \s -Console/write ] DEO }
+
+(
+    %<newline> ( -- )
+
+  Emit a new line character to standard output.
+
+  # Examples
+    > [ LIT "a ] <emit> <newline> [ LIT "b ] <emit> <newline>
+    a
+    b
+)
 %<newline> ( -- ) { [ LIT2 \n -Console/write ] DEO }
+
+(
+    %<emit> ( c -- )
+
+  Emit a character to standard output.
+
+  # Arguments
+  - `c`: Byte representing an ASCII character.
+
+  # Examples
+    > #55 <emit> <space> [ LIT "U ] <emit> <newline>
+    U U
+)
 %<emit> ( c -- ) { #18 DEO }
 
 (
     %\0 ( -- )
 
-  Indicate the end of a raw null terminated string, used instead of: `00`, 
-  `BRK` or `$1`.
+  Indicate the end of a raw null terminated string, used instead of the raw
+  byte: `00`, `BRK` or `$1`.
 
   # Examples
     > @foo "This \s "is \s "a \s "test! \n \0
@@ -30,7 +64,7 @@
 (
     %\t ( -- )
 
-  Indicate a tab in a raw string, used instead of: `09`.
+  Indicate a tab in a raw string, used instead of the raw byte: `09`.
 
   # Examples
     > @foo [
@@ -46,45 +80,37 @@
 %\t { 09 }
 
 (
-    %\t ( -- )
+    %\s ( -- )
 
-  Indicate a tab in a raw string, used instead of: `09`.
+  Indicate a space in a raw string, used instead of: `20`.
 
   # Examples
-    > @foo [
-      "This \s "is \s "the \s "first \s "line, \n
-      \t "The \s "second \s "line \s "is \s "tabbed. \n
-      09 "The \s "third \s "line \s "is \s "tabbed. \n \0
-    ] 
+    > @foo "This \s "is \s "a 20 "spaces 20 "example. \n \0 
     > ;foo <pstr>
-    This is the first line,
-        The second line is tabbed.
-        The third line is tabbed.
+    This is a spaces example.
 )
 %\s { 20 }
 
 (
-    %\t ( -- )
+    %\n ( -- )
 
-  Indicate a tab in a raw string, used instead of: `0a`.
+  Indicate a newline in a raw string, used instead of the raw byte: `0a`.
 
   # Examples
     > @foo [
       "This \s "is \s "the \s "first \s "line, \n
-      \t "The \s "second \s "line \s "is \s "tabbed. \n
-      09 "The \s "third \s "line \s "is \s "tabbed. \n \0
+      "This \s "is \s "the \s "second \s "line. 0a
     ] 
     > ;foo <pstr>
     This is the first line,
-        The second line is tabbed.
-        The third line is tabbed.
+    This is the second line.
 )
 %\n { 0a }
 
 (
     %NL ( -- )
 
-  Push the ASCII value of new line (`#0a`) to the stack.
+  Push the ASCII value of the new line character (`#0a`) to the stack.
 
   # Examples
     > [ LIT "a ] <emit> NL <emit> [ LIT "b ] <emit> #0a <emit>
@@ -97,7 +123,7 @@
 (
     %SP ( -- )
 
-  Push the ASCII value of space (`#20`) to the stack.
+  Push the ASCII value of the space character (`#20`) to the stack.
 
   # Examples
     > [ LIT "a ] <emit> SP <emit> [ LIT "b ] <emit> <newline>
@@ -110,7 +136,7 @@
 (
     %TB ( -- )
 
-  Push the ASCII value of tab (`#09`) to the stack.
+  Push the ASCII value of the tabulator character (`#09`) to the stack.
 
   # Examples
     > [ LIT "a ] <emit> <newline> TB <emit> [ LIT "b ] <emit> <newline>
