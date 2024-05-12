@@ -12,6 +12,77 @@
 %<space> ( -- ) { [ LIT2 \s -Console/write ] DEO }
 %<newline> ( -- ) { [ LIT2 \n -Console/write ] DEO }
 %<emit> ( c -- ) { #18 DEO }
-%\0 { 00 }  %\t { 09 }
-%NL { #0a }  %\n { 0a }
-%SP { #20 }  %\s { 20 }
+
+(
+    %\0 ( -- )
+
+  Indicate the end of a raw null terminated string, used instead of: `00`, 
+  `BRK` or `$1`.
+
+  # Examples
+    > @foo "This \s "is \s "a \s "test! \n \0
+    > @foo "This \s "is \s "a \s "test! \n BRK
+    > @foo "This \s "is \s "a \s "test! \n $1
+    > @foo "This 20 "is 20 "a 20 "test! 0a 00
+)
+%\0 { 00 }  
+
+(
+    %\t ( -- )
+
+  Indicate a tab in a raw string, used instead of: `09`.
+
+  # Examples
+    > @foo [
+      "This \s "is \s "the \s "first \s "line, \n
+      \t "The \s "second \s "line \s "is \s "tabbed. \n
+      09 "The \s "third \s "line \s "is \s "tabbed. \n \0
+    ] 
+    > ;foo <pstr>
+    This is the first line,
+        The second line is tabbed.
+        The third line is tabbed.
+)
+%\t { 09 }
+
+(
+    %\s ( -- )
+)
+%\s { 20 }
+%\n { 0a }
+
+(
+    %NL ( -- )
+
+  Push the ASCII value of new line (0x0a) to the stack.
+
+  # Examples
+    > NL <emit> #0a <emit>
+
+
+    >
+)
+%NL { #0a }
+
+(
+    %SP ( -- )
+
+  Push the ASCII value of space (0x20) to the stack.
+
+  # Examples
+    > [ LIT "a ] <emit> SP <emit> [ LIT "b ] <emit> <newline>
+    a b
+)
+%SP { #20 }
+
+(
+    %TB ( -- )
+
+  Push the ASCII value of tab (0x09) to the stack.
+
+  # Examples
+    > [ LIT "a ] <emit> <newline> TB <emit> [ LIT "b ] <emit> <newline>
+    a
+        b
+)
+%TB { #09 }

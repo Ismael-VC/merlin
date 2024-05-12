@@ -1,5 +1,5 @@
 
-@REPL ( char -> )
+@REPL ( char -> ) [
   ( Read )
   .Console/read DEI
   DUP SP NEQ ?{ POP BRK ( ignore ) }
@@ -44,6 +44,7 @@
 
   ( Loop )
   <print-prompt> BRK
+]
 
 @banner [
    \s \s "█ "▄ \s \s NAME
@@ -52,21 +53,23 @@
    \s \s \s \s \s \s ( "Type \s ""help" \s "for \s "help. \s ) 
 ]
 
-@<pmem-usage> ( -- )
+@<pmem-usage> ( -- ) [
   ;end ;heap-ptr LDA2 SUB2 <phex>
   ;&free <pstr>
   JMP2r
     &free [ \s "bytes \s "free. \n \0 ]
+]
 
-@<print-prompt> ( -- )
+@<print-prompt> ( -- ) [
   ;&prompt-start <pstr>
   ;heap-ptr LDA2 <phex>
   ;&prompt-end <pstr>
   JMP2r
     &prompt-start \n "փ \s "[ \0
     &prompt-end   "]> \s \0
+]
 
-@assemble-bytecode ( -- val* )
+@assemble-bytecode ( -- val* ) [
   [ LIT2r 0000 ] ;input
   &>loop ( str* `acc* -: val* )
     LDAk parse-nibble INC #00 EQU ?{
@@ -82,8 +85,10 @@
         &continue
     LDAk ?&>loop }
   POP2r POP2 JMP2r
+]
 
-@parse-nibble ( c -- val! )
+@parse-nibble ( c -- val! ) [
   ( dec ) [ LIT "0 ] SUB DUP #09 GTH ?{ JMP2r }
   ( hex ) #27 SUB DUP #0f GTH ?{ JMP2r }
   ( Error ) POP #ff JMP2r
+]

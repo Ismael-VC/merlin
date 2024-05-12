@@ -1,7 +1,7 @@
 (
 @|tokenizer )
 
-@parse-token ( t* -- )
+@parse-token ( t* -- ) [
   LDAk ,&rune STR
   ;runes/end ;runes
   &>l ( -- )
@@ -14,14 +14,17 @@
   is-hex ?<write-rawhex>
   is-opcode ?<write-opcode>
   !lib/litjsi
+]
 
-@walk-comment ( t* -- )
+@walk-comment ( t* -- ) [
   ;&c feof ?<sclr>
   [ LIT2 &c $1 28 ] NEQk ?{ ;Error/nested <set-error> }
   INC NEQ ?walk-comment
   !<sclr>
+]
 
-@lib &padabs INC2 get-any !<set-head>
+@lib [
+  &padabs INC2 get-any !<set-head>
   &padrel INC2 get-any ;head LDA2 ADD2 !<set-head>
   &toplab INC2 !<set-scope>
   &sublab INC2 get-sublabel !<create-symbol>
@@ -41,3 +44,4 @@
   <sclr>
   STH2r !handle-file
   &ignore POP2 JMP2r
+]

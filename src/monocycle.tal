@@ -15,13 +15,14 @@
 ~std-library.tal
 ~assets.tal
 
-@foo "foo \0
-@bar "bar \0
-@baz "foo \0
+@foo [
+  "This \s "is \s "the \s "first \s "line, \n
+  \t "The \s "second \s "line \s "is \s "tabbed. \n
+  09 "The \s "third \s "line \s "is \s "tabbed. \n \0
+]
 
 @main ( -- ) [
-  { "foo==bar-> \0 } STH2r <pstr> ;foo ;bar scmp3 <phex>/byte <newline>
-  { "foo \s "== \s "baz \s "-> \s \0 } STH2r <pstr> ;foo ;baz scmp3 <phex>/byte <newline>
+  ;foo <pstr>
 
   HLT
 ]
