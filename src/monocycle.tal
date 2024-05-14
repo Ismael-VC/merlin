@@ -1,9 +1,42 @@
-~Library/macros.tal
-~Debugger/macros.tal
-~Library/devices.tal
+~Library/IO/macros.tal (
+  %NL ( -- )
+  %SP ( -- )
+  %TB ( -- )
 
-~config.tal
+  %\n ( -- )
+  %\t ( -- )
+  %\s ( -- )
+  %\0 ( -- )
 
+  %<newline> ( -- )
+  %<space> ( -- )
+  %<tab> ( -- )
+)
+
+~Debugger/macros.tal (
+  %DBG ( -- )
+  %HLT ( -- )
+  %DBG! ( -- )
+)
+
+~Library/devices.tal (
+  @System
+  @Console
+  @Screen
+  @Audio0
+  @Audio1
+  @Audio2
+  @Audio3
+  @Controller
+  @Mouse
+  @File0
+  @File1
+  @Datetime
+)
+
+~config.tal (
+  @DEBUG ( Boolean )
+)
 
 ( zero page )
 |0000 [
@@ -57,12 +90,6 @@
 )
 
 ~Assembler/main.tal
-~Assembler/generics.tal
-~Assembler/tokenizer.tal
-~Assembler/primitives.tal
-~Assembler/output.tal
-~Assembler/labels.tal
-~Assembler/helpers.tal
 
 ~Library/string.tal
 
@@ -71,8 +98,8 @@
 @foo "This \s "is \s "a 20 "spaces 20 "example \n \0
 
 @main ( -- ) [
-  #55 <emit> <space> [ LIT "U ] <emit>
-  HLT
+  #55 <emit> <space> [ LIT "U ] <emit> <newline>
+  DBG!
 ]
 
 ~Assembler/memory.tal

@@ -1,2 +1,1 @@
-( constants )
-|0 @DEBUG ( set to |0 to enable debugging )
+|01 @DEBUG

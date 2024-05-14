@@ -18,21 +18,21 @@
   POP ( consume last newline )
   ( assemble-bytecode ) <assemble>
   ;REPL/assemble LDA ?{
-    ( assemble expression return jump )
-    #a0 ;expression-ptr LDA2 STA
-    ;REPL/expression-return ;expression-ptr LDA2 INC2 STA2
-    #2c ;expression-ptr LDA2 INC2 INC2 INC2 STA
-    ( reset expression-ptr )
-    ;expression ;expression-ptr STA2 }
+    ( assemble expr return jump )
+    #a0 ;expr-ptr LDA2 STA
+    ;REPL/expr-return ;expr-ptr LDA2 INC2 STA2
+    #2c ;expr-ptr LDA2 INC2 INC2 INC2 STA
+    ( reset expr-ptr )
+    ;expr ;expr-ptr STA2 }
   ;input ;input-ptr STA2 ( reset input-ptr )
 
   ( Eval )
   [ LIT &assemble $1 ] ?{
-    ;expression JMP2 }
-  &expression-return
+    ;expr JMP2 }
+  &expr-return
   #00 ,&assemble STR
   .DEBUG ?{
-    { \n "@input \s "& \s "@expression: \n $1 } STH2r <pstr>
+    { \n "@input \s "& \s "@expr: \n $1 } STH2r <pstr>
     ;input <pmem> <newline> }
   ;input #0100 <mclr>
 
@@ -78,8 +78,8 @@
       [ LIT2 &count 0200 ] INC DUP2 ,&count STR2
       GTH ?{ #0200 ,&count STR2
         STHkr ;REPL/assemble LDA ?{
-          ;expression-ptr LDA2 STA
-          ;expression-ptr LDA2 INC2 ;expression-ptr STA2 !&continue }
+          ;expr-ptr LDA2 STA
+          ;expr-ptr LDA2 INC2 ;expr-ptr STA2 !&continue }
         ;heap-ptr LDA2 STA
         ;heap-ptr LDA2 INC2 ;heap-ptr STA2 }
         &continue

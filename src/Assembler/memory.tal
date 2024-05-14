@@ -3,7 +3,7 @@
 ( pointers )
 @input-ptr $2
 @heap-ptr $2
-@expression-ptr $2
+@expr-ptr $2
 
 @Lambda/buf $100
 

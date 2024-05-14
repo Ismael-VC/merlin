@@ -31,3 +31,10 @@
   #0000 ;<create-symbol>/count STA2
   <assemble>
   BRK
+
+~Assembler/generics.tal
+~Assembler/tokenizer.tal
+~Assembler/primitives.tal
+~Assembler/output.tal
+~Assembler/labels.tal
+~Assembler/helpers.tal
