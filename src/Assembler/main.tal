@@ -1,4 +1,11 @@
-( assembler )
+(
+@|assembler )
+
+(
+    @on-init-src ( -> )
+
+  Check if there
+)
 @on-init-src ( -> )
   .Console/read DEI ;src store-key ?{ BRK }
   ;on-init-dst .Console/vector DEO2

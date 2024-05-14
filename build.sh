@@ -1,4 +1,5 @@
 cd src
-uxnasm monocycle.tal ../roms/monocycle.rom
+uxnasm monocycle.tal ../bin/monocycle.rom
 cd ..
-uxncli roms/monocycle.rom
+cp bin/monocycle.rom ~/roms
+uxncli bin/monocycle.rom

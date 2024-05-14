@@ -1,25 +1,78 @@
-~macros.tal
-~devices.tal
-~constants.tal
-~zero-page.tal
-~on-reset.tal
-~meta.tal
-~repl.tal
-~assembler.tal
-~generics.tal
-~tokenizer.tal
-~primitives.tal
-~output.tal
-~labels.tal
-~helpers.tal
-~library.tal
-~assets.tal
+~Library/macros.tal
+~Debugger/macros.tal
+~Library/devices.tal
 
-@foo "This \s "is \s "a 20 "spaces 20 "example \n \0 
+~config.tal
+
+
+( zero page )
+|0000 [
+  @input $80
+  @expr $80
+]
+
+( program )
+|0100 ( -> ) [
+  main
+  ;meta #06 DEO2
+  .Console/type DEI ?{
+     ;Info/usage <pstr>
+     #01 ;live STA }
+  ( ;on-init-src .Console/vector DEO2 )
+  BRK
+
+  ( set theme )
+  #2ae7 .System/r DEO2
+  #0a52 .System/g DEO2
+  #2a37 .System/b DEO2
+
+  ( set pointers )
+  ;heap ;heap-ptr STA2
+  ;input ;input-ptr STA2
+  ;expr ;expr-ptr STA2
+
+  ( init repl )
+  ;banner <pstr>
+  <pmem-usage>
+  <print-prompt>
+  ;REPL .Console/vector DEO2
+  BRK
+]
+
+@meta $1 [
+  ( name ) NAME
+  ( desc ) DESCRIPTION
+  ( auth ) AUTHOR
+  ( date ) DATE
+  ( exts ) 00
+]
+
+~Repl/main.tal (
+  @REPL ( -> )
+  @banner ( String )
+  @<pmem-usage> ( -- )
+  @<print-prompt> ( -- )
+  @assemble-bytecode ( -- )
+  @parse-nibble ( c -- val! )
+)
+
+~Assembler/main.tal
+~Assembler/generics.tal
+~Assembler/tokenizer.tal
+~Assembler/primitives.tal
+~Assembler/output.tal
+~Assembler/labels.tal
+~Assembler/helpers.tal
+
+~Library/string.tal
+
+~Assembler/assets.tal
+
+@foo "This \s "is \s "a 20 "spaces 20 "example \n \0
 
 @main ( -- ) [
   #55 <emit> <space> [ LIT "U ] <emit>
   HLT
 ]
 
-~memory.tal
+~Assembler/memory.tal

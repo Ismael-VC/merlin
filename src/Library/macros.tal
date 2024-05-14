@@ -6,10 +6,6 @@
   "Assembler. \n }
 %AUTHOR { "©07e8 \s "Ismael \s "Venegas \s "Castelló, \s "MIT \s "License. \n }
 
-%DBG ( -- ) { #010e DEO }
-%HLT ( -- ) { #010f DEO BRK }
-%DBG! ( -- ) { DBG HLT }
-
 (
     %<space> ( -- )
 
@@ -59,7 +55,7 @@
     > @foo "This \s "is \s "a \s "test! \n $1
     > @foo "This 20 "is 20 "a 20 "test! 0a 00
 )
-%\0 { 00 }  
+%\0 { 00 }
 
 (
     %\t ( -- )
@@ -71,7 +67,7 @@
       "This \s "is \s "the \s "first \s "line, \n
       \t "The \s "second \s "line \s "is \s "tabbed. \n
       09 "The \s "third \s "line \s "is \s "tabbed. \n \0
-    ] 
+    ]
     > ;foo <pstr>
     This is the first line,
         The second line is tabbed.
@@ -85,7 +81,7 @@
   Indicate a space in a raw string, used instead of: `20`.
 
   # Examples
-    > @foo "This \s "is \s "a 20 "spaces 20 "example. \n \0 
+    > @foo "This \s "is \s "a 20 "spaces 20 "example. \n \0
     > ;foo <pstr>
     This is a spaces example.
 )
@@ -100,7 +96,7 @@
     > @foo [
       "This \s "is \s "the \s "first \s "line, \n
       "This \s "is \s "the \s "second \s "line. 0a
-    ] 
+    ]
     > ;foo <pstr>
     This is the first line,
     This is the second line.

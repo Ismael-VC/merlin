@@ -1,6 +1,0 @@
-@meta $1
-  ( name ) NAME
-  ( desc ) DESCRIPTION
-  ( auth ) AUTHOR
-  ( date ) DATE
-  ( exts ) 00

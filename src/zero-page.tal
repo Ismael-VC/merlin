@@ -1,5 +1,0 @@
-( zero page )
-|0000 [
-  @input $80  
-  @expression $80
-]
