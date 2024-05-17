@@ -73,8 +73,8 @@
   ;banner <pstr>
   <pmem-usage>
 
-  { "<pmem>: \t \0 } STH2r <pstr> ;<pmem> <phex> <newline>
-  { "mem: \t \0 } STH2r <pstr> ;mem <phex> <newline>
+  { \n "<pmem>: \t \0 } STH2r <pstr> ;<pmem> <phex> <newline>
+  { \s \s \s "mem: \t \0 } STH2r <pstr> ;mem <phex> <newline>
   DBG
   <print-prompt>
   ;REPL .Console/vector DEO2

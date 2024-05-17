@@ -1,35 +1,57 @@
-➜  monocycle git:(main) ✗ monocycle
+➜  monocycle git:(main) ✗ ./build.sh
+-- Unused label: assemble-bytecode
+-- Unused label: on-init-src
+-- Unused label: lib
+-- Unused label: assembler-vars
+-- Unused label: src/len
+-- Unused label: src/buf
+-- Unused label: dst/len
+-- Unused label: head
+-- Unused label: rom
+Assembled ../bin/monocycle.rom in 3046 bytes(4.67% used), 361 labels, 18 macros.
   █▄  Monocycle CLI REPL Version 0.4 (16/05/2024)
 ▐ █ ▌ Varvara/Uxn Concatenated Interpretive Uxntal JIT Assembler.
  ▀█   ©2024 Ismael Venegas Castelló, MIT License.
-      61757 bytes free.
+      61673 bytes free.
 
-փ [0ec2]> @ "Hello 20 "Syntax 20 "World! 0a $1 ( @str ... )
+<pmem>: 09eb
+   mem: 0dec
 WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 
-փ [0ed7]> @ LDAk #18 DEO INC2 LDAk #0ed7 JCN2 POP2 JMP2r ( @<pstr> ... )
+փ [0f16]> @str "Hello 20 "Uxntal 20 "World! 0a $1
 WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 
-փ [0ee3]> ( Absolute call ) #0ec2 #0ed7 JSR2 ( ;str ;<pstr> JSR2 )
-Hello Syntax World!
+փ [0f2b]> @<pstr> ( str* -- ) LDAk #18 DEO INC2 LDAk ?<pstr> POP2 JMP2r
 WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 
-փ [0ee3]> ( Compute JSI offset ) #0000 #0012 SUB2
-WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00|ff ee <
-RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
-
-փ [0ee3]> ( Relative call ) #0ec2 60 ffee ( ;str <pstr> )
-Hello Syntax World!
-WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00|ff ee <
-RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
-
-փ [0ee3]> POP2
+փ [0f36]> ;str ;<pstr> JSR2 ( absolute call )
+Hello Uxntal World!
 WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
 
-փ [0ee3]> #800f DEO BRK ( exit )
+փ [0f36]> ;str ,<pstr> JSR ( relative call )
+Hello Uxntal World!
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0f36]> ;str <pstr> ( immediate call )
+Hello Uxntal World!
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0f36]> { "I 20 "❤️ 0a "UXN 0a00 } STH2r <pstr>
+I ❤️
+UXN
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0f36]> @exit ( -> ) #800f DEO BRK
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0f3b]> exit
 ➜  monocycle git:(main) ✗ echo $?
 0
