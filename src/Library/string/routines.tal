@@ -300,7 +300,7 @@
   [ LIT2r 0000 ]
   &>w ( `i* -- )
     ( acc ) [ LITr 40 ] SFT2r
-    ( res ) LDAk chex DBG! [ LITr 00 ] STH
+    ( res ) LDAk chex [ LITr 00 ] STH
     ADD2r INC2 LDAk ?&>w
   POP2 STH2r JMP2r
 ]

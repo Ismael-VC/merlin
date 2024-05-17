@@ -58,10 +58,6 @@
 ( program )
 |0100 ( -> ) [
   ;meta #06 DEO2
-  .Console/type DEI ?{
-     ;Info/usage <pstr>
-     #01 ;live STA }
-  ( ;on-init-src .Console/vector DEO2 )
 
   ( set theme )
   #2ae7 .System/r DEO2

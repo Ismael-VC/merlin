@@ -15,19 +15,20 @@
   [ LIT &multi-line 01 ] ?{
     POP BRK }
   POP ( consume last newline )
+  ;heap-ptr LDA2 STH2
   ( assemble-bytecode ) <assemble>
   ;REPL/assemble LDA ?{
     ( assemble expr return jump )
-    #a0 ;expr-ptr LDA2 STA
-    ;REPL/expr-return ;expr-ptr LDA2 INC2 STA2
-    #2c ;expr-ptr LDA2 INC2 INC2 INC2 STA
+    #a0 ;heap-ptr LDA2 STA
+    ;REPL/expr-return ;heap-ptr LDA2 INC2 STA2
+    #2c ;heap-ptr LDA2 INC2 INC2 INC2 STA
     ( reset expr-ptr )
-    ;expr ;expr-ptr STA2 }
+    STH2kr ;heap-ptr STA2 }
   ;input ;input-ptr STA2 ( reset input-ptr )
 
   ( Eval )
   [ LIT &assemble $1 ] ?{
-    ;expr JMP2 }
+    STH2r JMP2 }
   &expr-return
   #00 ,&assemble STR
   .DEBUG ?{

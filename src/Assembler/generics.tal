@@ -3,14 +3,14 @@
 
 @<assemble> ( -- )
   ( scan ) #01 handle-pass
-  ( make ) #00 handle-pass
-  <write-rom>
-  <write-sym>
+  ( make #00 handle-pass )
+  ( <write-rom> )
+  ( <write-sym> )
   !<print-summary>
 
 @handle-pass ( scan -: Error )
   ;scan STA
-  ;heap-ptr <set-head>
+  ;heap-ptr LDA2 <set-heap-ptr>
   handle-input JMP2r
 
 @handle-input ( str* -- )
@@ -22,5 +22,5 @@
   POP2 JMP2r
 
 @handle-char ( c -- )
-  ;token store-key ?{ DBG JMP2r }
+  ;token store-key ?{ JMP2r }
   ;token/buf DUP2 parse-token !<sclr>
