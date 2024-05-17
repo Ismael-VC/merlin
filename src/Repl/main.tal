@@ -13,7 +13,7 @@
     ;input-ptr LDA2 STA
     ;input-ptr LDA2 INC2 ;input-ptr STA2  BRK }
   [ LIT &multi-line 01 ] ?{
-    POP BRK }
+    { 2020 2020 2020 "... \s \0 } STH2r <pstr> POP BRK }
   POP ( consume last newline )
   ;heap-ptr LDA2 STH2
   ( assemble-bytecode ) <assemble>
