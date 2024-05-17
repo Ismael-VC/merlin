@@ -3,7 +3,7 @@
 @Info [
   &usage "usage: 20 "drifblim.rom 20 "in.tal 20 "out.rom 0a $1
   &unused "-- 20 "Unused: 20 $1
-  &reset "on-reset $1
+  &on-repl "on-repl $1
   &assembled "Assembled 20 $1
   &in 20 "in 20 $1
   &bytes 20 "bytes( $1
@@ -34,7 +34,7 @@
   "EQU "NEQ "GTH "LTH "JMP "JCN "JSR "STH
   "LDZ "STZ "LDR "STR "LDA "STA "DEI "DEO
   "ADD "SUB "MUL "DIV "AND "ORA "EOR "SFT
-  &brk "BRK 
+  &brk "BRK
 ]
 
 @runes [

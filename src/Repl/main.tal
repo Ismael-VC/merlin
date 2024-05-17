@@ -2,7 +2,7 @@
   ( Read )
   .Console/read DEI
   ( DUP SP NEQ ?{ POP BRK ( ignore ) } )
-  DUP LIT "@ NEQ ?{ #01 ;&assemble STA POP BRK }
+  DUP LIT "@ NEQ ?{ #01 ;&assemble STA }
   DUP LIT "[ NEQ ?{ #00 ,&multi-line STR POP BRK }
   DUP LIT "] NEQ ?{ #01 ,&multi-line STR POP BRK }
   DUP LIT "( NEQ ?{ #00 ,&comment STR POP BRK }

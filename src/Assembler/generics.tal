@@ -2,16 +2,19 @@
 @|generics )
 
 @<assemble> ( -- )
+  ;heap-ptr LDA2 STH2
   ( scan ) #01 handle-pass
-  ( make #00 handle-pass )
+  ( make ) #00 handle-pass
   ( <write-rom> )
   ( <write-sym> )
   ( !<print-summary> )
-  JMP2r
+  POP2r JMP2r
 
 @handle-pass ( scan -: Error )
   ;scan STA
-  ;heap-ptr LDA2 <set-heap-ptr>
+  OVR2r STH2r <set-heap-ptr>
+  #00 ;Lambda/count STA
+  ;Info/on-repl <set-scope>
   handle-input JMP2r
 
 @handle-input ( str* -- )

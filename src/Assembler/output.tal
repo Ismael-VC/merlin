@@ -27,7 +27,7 @@
     INC2k INC2 LDA ?&skip
     #0003 ADD2 LDAk [ LIT "A ] SUB #1a LTH ?&skip
     LDAk [ LIT 28 ] EQU ?&skip
-    DUP2 ;Info/reset scmp ?&skip
+    DUP2 ;Info/on-repl scmp ?&skip
     ;Info/unused <pstr>/
     DUP2 <pstr>/
     #0a18 DEO
