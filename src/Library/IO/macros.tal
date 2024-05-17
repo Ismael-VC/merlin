@@ -1,0 +1,36 @@
+(
+    %<space> ( -- )
+
+  Emit a space character to standard output.
+
+  # Examples
+    > [ LIT "a ] <emit> <space> [ LIT "b ] <emit> <newline>
+    a b
+)
+%<space> ( -- ) { [ LIT2 \s -Console/write ] DEO }
+
+(
+    %<newline> ( -- )
+
+  Emit a new line character to standard output.
+
+  # Examples
+    > [ LIT "a ] <emit> <newline> [ LIT "b ] <emit> <newline>
+    a
+    b
+)
+%<newline> ( -- ) { [ LIT2 \n -Console/write ] DEO }
+
+(
+    %<emit> ( c -- )
+
+  Emit a character to standard output.
+
+  # Arguments
+  - `c`: Byte representing an ASCII character.
+
+  # Examples
+    > #55 <emit> <space> [ LIT "U ] <emit> <newline>
+    U U
+)
+%<emit> ( c -- ) { #18 DEO }

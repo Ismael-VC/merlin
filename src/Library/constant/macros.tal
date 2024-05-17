@@ -1,0 +1,40 @@
+(
+    %NL ( -- )
+
+  Push the ASCII value of the new line character (`#0a`) to the stack.
+
+  # Examples
+    > [ LIT "a ] <emit> NL <emit> [ LIT "b ] <emit> #0a <emit>
+    a
+    b
+    >
+)
+%NL { #0a }
+
+(
+    %SP ( -- )
+
+  Push the ASCII value of the space character (`#20`) to the stack.
+
+  # Examples
+    > [ LIT "a ] <emit> SP <emit> [ LIT "b ] <emit> <newline>
+    a b
+    > [ LIT "c ] <emit> #20 <emit> [ LIT "d ] <emit> <newline>
+    c d
+)
+%SP { #20 }
+
+(
+    %TB ( -- )
+
+  Push the ASCII value of the tabulator character (`#09`) to the stack.
+
+  # Examples
+    > [ LIT "a ] <emit> <newline> TB <emit> [ LIT "b ] <emit> <newline>
+    a
+        b
+    > [ LIT "c ] <emit> <newline> #09 <emit> [ LIT "d ] <emit> <newline>
+    c
+        d
+)
+%TB { #09 }

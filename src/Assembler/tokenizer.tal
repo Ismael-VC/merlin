@@ -24,8 +24,8 @@
 ]
 
 @lib [
-  &padabs INC2 get-any !<set-head>
-  &padrel INC2 get-any ;head LDA2 ADD2 !<set-head>
+  &padabs INC2 get-any !<set-heap-ptr>
+  &padrel INC2 get-any ;heap-ptr LDA2 ADD2 !<set-heap-ptr>
   &toplab INC2 !<set-scope>
   &sublab INC2 get-sublabel !<create-symbol>
   &litrel #80 <write>
@@ -42,6 +42,6 @@
   &lambda POP2 !Lambda/pop
   &inc INC2k ;mem/include STH2k <scpy>
   <sclr>
-  STH2r !handle-file
+  STH2r !handle-input
   &ignore POP2 JMP2r
 ]

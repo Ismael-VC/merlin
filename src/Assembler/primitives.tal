@@ -25,7 +25,7 @@
 
 @<write-call> ( str* opc -: )
   <write>
-  get-ref ;head LDA2 INC2 INC2 SUB2
+  get-ref ;heap-ptr LDA2 INC2 INC2 SUB2
   ( >> )
 
 @<write-short> ( short* -: )
@@ -33,14 +33,14 @@
   ( >> )
 
 @<write> ( byte -: )
-  DUP ;head LDA2 INC2k STH2
+  DUP ;heap-ptr LDA2 INC2k STH2
   ;rom ADD2 STA
   <set-length>
   STH2r
   ( >> )
 
-@<set-head> ( v* -: )
-  ;head STA2
+@<set-heap-ptr> ( v* -: )
+  ;heap-ptr STA2
   JMP2r
 
 @<set-error> ( name* -- )
@@ -57,7 +57,7 @@
 @<set-length> ( byte -- )
   ?{ JMP2r }
   ;scan LDA ?{ JMP2r }
-  ;head LDA2
+  ;heap-ptr LDA2
   ( ) DUP2 OVR ?{ ;Error/zeropage <set-error> }
   ( ) #8000 LTH2 ?{ ;Error/length <set-error> }
   ;length STA2

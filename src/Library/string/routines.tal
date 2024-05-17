@@ -1,7 +1,7 @@
-( 
+(
     @|stdlib
 
-  Implement standard routines for handling an visualizing memory and values. 
+  Implement standard routines for handling an visualizing memory and values.
 )
 
 (
@@ -56,6 +56,9 @@
   POP2 POP2 JMP2r
 ]
 
+@<pobj> ( addr* name* -- )
+  SWP2r STH2r <pstr> <newline> <pmem> JMP2r
+
 (
     @<pmem> ( addr* -- )
 
@@ -70,7 +73,7 @@
     0d08  54 68 69 73 20 69 73 20  61 20 74 65 73 74 21 0a  |This.is.a.test!.|
     ⋮
     0df8  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-    0e08  
+    0e08
 )
 @<pmem> ( addr* -- ) [
   STH2k DUP2 <phex> <space> <space> #0000
@@ -92,8 +95,8 @@
 ]
 
 @feof ( addr* -: f ) [
-  .File/read DEO2
-  .File/success DEI2 #0000 EQU2 JMP2r
+  .File0/read DEO2
+  .File0/success DEI2 #0000 EQU2 JMP2r
 ]
 
 (
@@ -181,8 +184,8 @@
   # Examples
     > @foo "This \s "is \s "a \s "test! \n \0
     > ;foo slen <psts>
-    WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00|00 10 < 
-    RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|< 
+    WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00|00 10 <
+    RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
     > <pdec> <newline>
     16
 )
@@ -201,7 +204,7 @@
 
   # Returns
   - `f`: A boolean flag indicating if both strings are equal.
-  
+
   # Examples
     > @foo "foo \0
     > @bar "bar \0
@@ -231,7 +234,7 @@
 
   # Returns
   - `f`: A boolean flag indicating if both strings are equal.
-  
+
   # Examples
     > @foo "foo \0
     > @bar "bar \0

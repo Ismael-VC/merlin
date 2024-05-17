@@ -1,8 +1,7 @@
-
 @REPL ( char -> ) [
   ( Read )
   .Console/read DEI
-  DUP SP NEQ ?{ POP BRK ( ignore ) }
+  ( DUP SP NEQ ?{ POP BRK ( ignore ) } )
   DUP LIT "@ NEQ ?{ #01 ;&assemble STA POP BRK }
   DUP LIT "[ NEQ ?{ #00 ,&multi-line STR POP BRK }
   DUP LIT "] NEQ ?{ #01 ,&multi-line STR POP BRK }
@@ -50,11 +49,11 @@
    \s \s "█ "▄ \s \s NAME
    "▐ \s "█ \s "▌ \s DESCRIPTION
    \s "▀ "█ \s \s \s AUTHOR
-   \s \s \s \s \s \s ( "Type \s ""help" \s "for \s "help. \s ) 
+   \s \s \s \s \s \s \0 ( "Type \s ""help" \s "for \s "help. \s )
 ]
 
 @<pmem-usage> ( -- ) [
-  ;end ;heap-ptr LDA2 SUB2 <phex>
+  ;end ;heap-ptr LDA2 SUB2 <pdec>
   ;&free <pstr>
   JMP2r
     &free [ \s "bytes \s "free. \n \0 ]

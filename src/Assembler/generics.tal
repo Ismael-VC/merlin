@@ -2,36 +2,25 @@
 @|generics )
 
 @<assemble> ( -- )
-  ( scan ) #01 handle-pass ?&fail
-  ( make ) #00 handle-pass ?&fail
+  ( scan ) #01 handle-pass
+  ( make ) #00 handle-pass
   <write-rom>
   <write-sym>
   !<print-summary>
-  &fail ( -- )
-  ;dst/buf .File/name DEO2
-  [ LIT2 01 -File/delete ] DEO
-  JMP2r
 
 @handle-pass ( scan -: Error )
   ;scan STA
-  #0100 <set-head>
-  #00 ;Lambda/count STA
-  ;Info/reset <set-scope>
-  ;src/buf handle-file ;halt LDA JMP2r
+  ;heap-ptr <set-head>
+  handle-input JMP2r
 
-@handle-file ( f* -- )
-  .File/name DEO2
-  #0001 .File/length DEO2
-  #0000
-  &>s ( len* -- )
-    ;&c feof ?&end
-    INC2 [ LIT &c $1 ] handle-char !&>s
-  &end ( len* -- )
-  ORA ?{
-    ;mem/include ;token/buf <scpy>
-    ;Error/file <set-error> }
-  JMP2r
+@handle-input ( str* -- )
+  ;input
+  &loop ( str* -- )
+    LDAk handle-char
+    INC2 LDAk ?&loop
+  NL handle-char
+  POP2 JMP2r
 
 @handle-char ( c -- )
-  ;token store-key ?{ JMP2r }
+  ;token store-key ?{ DBG JMP2r }
   ;token/buf DUP2 parse-token !<sclr>
