@@ -32,14 +32,13 @@
   POP2r
   &expr-return
   #00 ,&assemble STR
-  #01 ?{
-    { "@input: \0 } ;input <pobj> <newline> }
   ;input #0100 <mclr>
 
   ( Print )
   DBG
   .DEBUG ?{
-    { \n "@heap \0 } ;heap <pobj> }
+    { \n "@heap \0 } ;heap <pobj>
+    { \n "@mem/symbols \0 } ;mem/symbols <pobj> }
 
   ( Loop )
   <print-prompt> BRK

@@ -1,0 +1,5 @@
+@<pstr> ( str* -- ) [
+  LDAk #18 DEO
+  INC2 & LDAk ?<pstr>
+  POP2 JMP2r
+]
