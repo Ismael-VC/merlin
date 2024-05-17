@@ -1,0 +1,27 @@
+➜  monocycle git:(main) ✗ monocycle-gui
+  █▄  Monocycle CLI REPL Version 0.4 (16/05/2024)
+▐ █ ▌ Varvara/Uxn Concatenated Interpretive Uxntal JIT Assembler.
+ ▀█   ©2024 Ismael Venegas Castelló, MIT License.
+      61673 bytes free.
+
+<pmem>: 09eb
+   mem: 0dec
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0f16]> [
+  @draw-pixel ( x* y* color -- )
+    STH
+    #2a DEO2
+    #28 DEO2
+    STHr #2e DEO
+    JMP2r
+]
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0f22]> [ LITr 0064 ] #ff00 &l STH2kr INC2r STH2kr #12 draw-pixel INC GTHk ?&l POP2 POPr
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0f22]>

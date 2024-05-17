@@ -1,0 +1,8 @@
+[
+  @draw-pixel ( x* y* color -- )
+    STH
+    #2a DEO2
+    #28 DEO2
+    STHr #2e DEO
+    JMP2r
+]
