@@ -32,7 +32,7 @@
   POP2r
   &expr-return
   #00 ,&assemble STR
-  .DEBUG ?{
+  #01 ?{
     { "@input: \0 } ;input <pobj> <newline> }
   ;input #0100 <mclr>
 

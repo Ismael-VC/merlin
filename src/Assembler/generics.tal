@@ -6,7 +6,8 @@
   ( make #00 handle-pass )
   ( <write-rom> )
   ( <write-sym> )
-  !<print-summary>
+  ( !<print-summary> )
+  JMP2r
 
 @handle-pass ( scan -: Error )
   ;scan STA

@@ -1,0 +1,35 @@
+➜  monocycle git:(main) ✗ monocycle
+  █▄  Monocycle CLI REPL Version 0.4 (16/05/2024)
+▐ █ ▌ Varvara/Uxn Concatenated Interpretive Uxntal JIT Assembler.
+ ▀█   ©2024 Ismael Venegas Castelló, MIT License.
+      61757 bytes free.
+
+փ [0ec2]> @ "Hello 20 "Syntax 20 "World! 0a $1 ( @str ... )
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0ed7]> @ LDAk #18 DEO INC2 LDAk #0ed7 JCN2 POP2 JMP2r ( @<pstr> ... )
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0ee3]> ( Absolute call ) #0ec2 #0ed7 JSR2 ( ;str ;<pstr> JSR2 )
+Hello Syntax World!
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0ee3]> ( Compute JSI offset ) #0000 #0012 SUB2
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00|ff ee <
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0ee3]> ( Relative call ) #0ec2 60 ffee ( ;str <pstr> )
+Hello Syntax World!
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00|ff ee <
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0ee3]> POP2
+WST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+RST 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|<
+
+փ [0ee3]> #800f DEO BRK ( exit )
+➜  monocycle git:(main) ✗ echo $?
+0
