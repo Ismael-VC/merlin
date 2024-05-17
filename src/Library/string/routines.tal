@@ -56,7 +56,7 @@
   POP2 POP2 JMP2r
 ]
 
-@<pobj> ( addr* name* -- )
+@<pobj> ( addr* | {name}* -- )
   SWP2r STH2r <pstr> <newline> <pmem> JMP2r
 
 (
