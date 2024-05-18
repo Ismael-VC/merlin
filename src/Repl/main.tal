@@ -13,10 +13,13 @@
     ;input-ptr LDA2 STA
     ;input-ptr LDA2 INC2 ;input-ptr STA2  BRK }
   [ LIT &multi-line 01 ] ?{
-    { 2020 2020 2020 "... \s \0 } STH2r <pstr> POP BRK }
+    { 2020 2020 2020 "... \s \0 } STH2r <pstr>
+    ;input-ptr LDA2 STA
+    ;input-ptr LDA2 INC2 ;input-ptr STA2  BRK
+    POP BRK }
   POP ( consume last newline )
   ;heap-ptr LDA2 STH2
-  ( assemble-bytecode ) <assemble>
+  <assemble>
   ;REPL/assemble LDA ?{
     ( assemble expr return jump )
     #a0 ;heap-ptr LDA2 STA
@@ -28,15 +31,21 @@
 
   ( Eval )
   [ LIT &assemble $1 ] ?{
-    STH2r JMP2 }
+    STH2kr JMP2
+
+    &expr-return
+      STH2kr ;<create-symbol>/ptr STA2
+      STH2r ;length <mclr> !&continue }
   POP2r
-  &expr-return
+  &continue
   #00 ,&assemble STR
   ;input #0100 <mclr>
+  #0000 ;length STA2
+
 
   ( Print )
   DBG
-  .DEBUG ?{
+  #01 ?{
     { \n "@heap \0 } ;heap <pobj>
     { \n "@mem/symbols \0 } ;mem/symbols <pobj> }
 
@@ -65,28 +74,4 @@
   JMP2r
     &prompt-start \n "փ \s "[ \0
     &prompt-end   "]> \s \0
-]
-
-@assemble-bytecode ( -- val* ) [
-  [ LIT2r 0000 ] ;input
-  &>loop ( str* `acc* -: val* )
-    LDAk parse-nibble INC #00 EQU ?{
-      [ LITr 40 ] SFT2r LDAk parse-nibble [ LITr 00 ] STH
-      ADD2r INC2
-      [ LIT2 &count 0200 ] INC DUP2 ,&count STR2
-      GTH ?{ #0200 ,&count STR2
-        STHkr ;REPL/assemble LDA ?{
-          ;expr-ptr LDA2 STA
-          ;expr-ptr LDA2 INC2 ;expr-ptr STA2 !&continue }
-        ;heap-ptr LDA2 STA
-        ;heap-ptr LDA2 INC2 ;heap-ptr STA2 }
-        &continue
-    LDAk ?&>loop }
-  POP2r POP2 JMP2r
-]
-
-@parse-nibble ( c -- val! ) [
-  ( dec ) [ LIT "0 ] SUB DUP #09 GTH ?{ JMP2r }
-  ( hex ) #27 SUB DUP #0f GTH ?{ JMP2r }
-  ( Error ) POP #ff JMP2r
 ]

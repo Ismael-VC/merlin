@@ -35,6 +35,5 @@
 ~Assembler/generics.tal
 ~Assembler/tokenizer.tal
 ~Assembler/primitives.tal
-~Assembler/output.tal
 ~Assembler/labels.tal
 ~Assembler/helpers.tal

@@ -73,8 +73,11 @@
   ;banner <pstr>
   <pmem-usage>
 
-  { \n "<pmem>: \t \0 } STH2r <pstr> ;<pmem> <phex> <newline>
-  { \s \s \s "mem: \t \0 } STH2r <pstr> ;mem <phex> <newline>
+  { \n \t "@<pmem> \t \0 } STH2r <pstr> ;<pmem> <phex> <newline>
+  { \t "@mem/symbols \t \0 } STH2r <pstr> ;mem/symbols <phex> <newline>
+  { \t "@<create-symbol>/ptr \t \0 } STH2r <pstr> ;<create-symbol>/ptr <phex> <newline>
+  { \t "@<create-symbol>/count \t \0 } STH2r <pstr> ;<create-symbol>/count <phex> <newline>
+  { \t "@length \t \0 } STH2r <pstr> ;length <phex> <newline>
   DBG
   <print-prompt>
   ;REPL .Console/vector DEO2

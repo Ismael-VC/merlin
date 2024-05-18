@@ -58,7 +58,7 @@
   is-hex ?shex
   !get-ref/eager
 
-@get-ref ( token* -- addr* )
+@get-ref ( token* -- addr* ) DUP2 <pstr> <newline>
   LDAk [ LIT "{ ] NEQ ?{ POP2 Lambda/push }
   ;scan LDA ?&scan
   &eager ( -- )

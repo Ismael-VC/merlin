@@ -6,12 +6,7 @@
 @expr-ptr $2
 
 @Lambda/buf $100
-
-@mem ( buffers ) [
-  &include $30
-  &symbols ( addr*, refs, name[], 00 )
-]
-
+@rom &output
 @assembler-vars [
   @src &len $1 &buf $30
   @dst &len $1 &buf $30
@@ -28,5 +23,8 @@
 ( heap )
 @heap
 
-|8000 @rom $100 &output
+|fbcf @mem ( buffers ) [
+  &include $30
+  &symbols ( addr*, refs, name[], 00 )
+]
 |ffff @end

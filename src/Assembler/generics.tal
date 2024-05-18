@@ -5,10 +5,8 @@
   ;heap-ptr LDA2 STH2
   ( scan ) #01 handle-pass
   ( make ) #00 handle-pass
-  ( <write-rom> )
-  ( <write-sym> )
-  ( !<print-summary> )
-  POP2r JMP2r
+  POP2r
+  !<print-summary>
 
 @handle-pass ( scan -: Error )
   ;scan STA
@@ -28,3 +26,32 @@
 @handle-char ( c -- )
   ;token store-key ?{ JMP2r }
   ;token/buf DUP2 parse-token !<sclr>
+
+@<print-summary> ( -- )
+  ( | Print summary )
+  ;<create-symbol>/ptr LDA2 ;mem/symbols
+  &>l ( -- )
+    INC2k INC2 LDA ?&skip
+    #0003 ADD2 LDAk [ LIT "A ] SUB #1a LTH ?&skip
+    LDAk [ LIT 28 ] EQU ?&skip
+    DUP2 ;Info/on-repl scmp ?&skip
+    ;Info/unused <pstr>/
+    DUP2 <pstr>/
+    #0a18 DEO
+    &skip scap/ INC2 GTH2k ?&>l
+  POP2 POP2
+  ( | result )
+  ;Info/assembled <pstr>/
+  ;REPL/assemble LDA ?{
+    { "expr \0 } STH2r <pstr>/
+    !&length
+  }
+
+  &length
+  ;Info/in <pstr>/
+  ;length LDA2 <pdec>
+  ;Info/bytes <pstr>/
+  ;<create-symbol>/count LDA2 DUP2k <pdec>
+  #0001 GTH2 #0000 EQU2 ORA ?{
+    { \s "label). \n \0 } STH2r !<pstr>/ }
+  ;Info/labels !<pstr>/

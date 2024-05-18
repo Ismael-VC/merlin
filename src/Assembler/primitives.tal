@@ -57,8 +57,8 @@
 @<set-length> ( byte -- )
   ?{ JMP2r }
   ;scan LDA ?{ JMP2r }
-  ;heap-ptr LDA2
-  ( DUP2 ) OVR ?{ ;Error/zeropage <set-error> }
+  ;length LDA2 INC2
+  ( DUP2 OVR ?{ ;Error/zeropage <set-error> } )
   ( #8000 LTH2 ?{ ;Error/length <set-error> } )
   ;length STA2
   JMP2r

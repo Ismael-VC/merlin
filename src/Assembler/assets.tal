@@ -6,7 +6,7 @@
   &on-repl "on-repl $1
   &assembled "Assembled 20 $1
   &in 20 "in 20 $1
-  &bytes 20 "bytes( $1
+  &bytes 20 "bytes 20 "( $1
   &labels 20 "labels). 0a $1
   &sym-ext ".sym $1
   &live "Listening.. 0a $1
